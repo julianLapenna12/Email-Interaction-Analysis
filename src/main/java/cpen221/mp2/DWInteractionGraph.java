@@ -1,9 +1,21 @@
 package cpen221.mp2;
 
-import java.util.List;
-import java.util.Set;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
 
 public class DWInteractionGraph {
+
+    private List<String> emails = new ArrayList<String>();          //Stores all raw email data
+    private List<int []> emailData = new ArrayList<int[]>();        //Stores source id and destination id at corresponding indecies for each email
+    private List<int []> interactions = new ArrayList<int []>();    //Stores number of interactions between users - number at each index is interactions between user (index of list) and user at index
+    private Set<Integer> sendIds = new HashSet<Integer>();          //Stores all ids of people who sent emails
+    private Set<Integer> destIds = new HashSet<Integer>();          //Stores all ids of people who recieved emails
+    private Set<Integer> ids = new HashSet<Integer>();
+    private Map<Integer, Integer> userIndex = new HashMap<Integer, Integer>();
+
+    //NOTE- Format of data in text files is SourceID DestinationID TimestampFrom0
 
     /* ------- Task 1 ------- */
     /* Building the Constructors */
@@ -17,6 +29,21 @@ public class DWInteractionGraph {
      */
     public DWInteractionGraph(String fileName) {
         // TODO: Implement this constructor
+
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
+                emails.add(fileLine);
+            }
+            reader.close();
+        } catch (IOException ioe) {
+            System.out.println("Problem reading file!");
+        }
+
+        getData(emails);
+        categorizeEmails(emailData);
+
     }
 
     /**
@@ -31,7 +58,14 @@ public class DWInteractionGraph {
      *                   t0 <= t <= t1 range.
      */
     public DWInteractionGraph(DWInteractionGraph inputDWIG, int[] timeFilter) {
-        // TODO: Implement this constructor
+        List<int[]> newEmailData = new ArrayList<int[]>();
+        for (int i = 0; i < inputDWIG.emailData.size(); i++) {
+            if (inputDWIG.emailData.get(i)[2]> timeFilter[0] && inputDWIG.emailData.get(i)[2] < timeFilter[1]) {
+                newEmailData.add(inputDWIG.emailData.get(i));
+            }
+        }
+
+        categorizeEmails(newEmailData);
     }
 
     /**
@@ -45,7 +79,14 @@ public class DWInteractionGraph {
      *                   nor the receiver exist in userFilter.
      */
     public DWInteractionGraph(DWInteractionGraph inputDWIG, List<Integer> userFilter) {
-        // TODO: Implement this constructor
+        List<int[]> newEmailData = new ArrayList<int[]>();
+        for (int i = 0; i < inputDWIG.emailData.size(); i++) {
+            if (!(userFilter.contains(inputDWIG.emailData.get(i)[0]) || userFilter.contains(inputDWIG.emailData.get(i)[0]))) {
+                newEmailData.add(inputDWIG.emailData.get(i));
+            }
+        }
+
+        categorizeEmails(newEmailData);
     }
 
     /**
@@ -53,8 +94,7 @@ public class DWInteractionGraph {
      * in this DWInteractionGraph.
      */
     public Set<Integer> getUserIDs() {
-        // TODO: Implement this getter method
-        return null;
+        return ids;
     }
 
     /**
@@ -64,8 +104,67 @@ public class DWInteractionGraph {
      * receiver in this DWInteractionGraph.
      */
     public int getEmailCount(int sender, int receiver) {
-        // TODO: Implement this getter method
-        return 0;
+        return interactions.get(userIndex.get(sender))[userIndex.get(receiver)];
+    }
+
+
+    private void categorizeEmails(List<int[]> emailData) {
+
+        ids.addAll(sendIds);
+        ids.addAll(destIds);
+
+        for (int i = 0; i < ids.size(); i++) {
+            userIndex.put((int)ids.toArray()[i], i);
+        }
+
+        for(int i = 0; i < ids.size(); i++) {
+            int [] dataForUser = new int[ids.size()];
+            for (int j = 0; j < emailData.size(); j++) {
+                if ((int)ids.toArray()[i]==emailData.get(j)[0]) {
+                    dataForUser[userIndex.get(emailData.get(j)[1])]++;
+                }
+            }
+            interactions.add(dataForUser);
+        }
+    }
+
+    private void getData(List<String> emails) {
+        int sendId = 0;
+        int destId = 0;
+        int timeId = 0;
+        int counter = 0;
+        boolean cont = true;
+
+        for(int i = 0; i < emails.size(); i++) {
+            int [] srcDstTime = new int[3];
+            while(cont) {
+                if (emails.get(i).charAt(counter)==' ') {
+                    System.out.println(emails.get(i).substring(0, counter));
+                    sendId = Integer.parseInt(emails.get(i).substring(0, counter));
+                    cont = false;
+                }
+                counter++;
+            }
+            cont = true;
+            int start = counter;
+            while (cont) {
+                if (emails.get(i).charAt(counter)==' ') {
+                    destId = Integer.parseInt(emails.get(i).substring(start, counter));
+                    cont = false;
+                }
+                counter++;
+            }
+
+            sendIds.add(sendId);
+            destIds.add(destId);
+
+            srcDstTime[0] = sendId;
+            srcDstTime[1] = destId;
+            srcDstTime[2] = timeId;
+            emailData.add(srcDstTime);
+            counter = 0;
+            cont = true;
+        }
     }
 
     /* ------- Task 2 ------- */
