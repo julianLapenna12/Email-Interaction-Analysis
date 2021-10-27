@@ -8,12 +8,16 @@ import java.util.*;
 public class DWInteractionGraph {
 
     private List<String> emails = new ArrayList<String>();          //Stores all raw email data
-    private List<int []> emailData = new ArrayList<int[]>();        //Stores source id and destination id at corresponding indecies for each email
+    private List<int []> emailData = new ArrayList<int[]>();        //Stores source id and destination id at corresponding indicies for each email
     private List<int []> interactions = new ArrayList<int []>();    //Stores number of interactions between users - number at each index is interactions between user (index of list) and user at index
     private Set<Integer> sendIds = new HashSet<Integer>();          //Stores all ids of people who sent emails
-    private Set<Integer> destIds = new HashSet<Integer>();          //Stores all ids of people who recieved emails
+    private Set<Integer> destIds = new HashSet<Integer>();          //Stores all ids of people who received emails
     private Set<Integer> ids = new HashSet<Integer>();
     private Map<Integer, Integer> userIndex = new HashMap<Integer, Integer>();
+
+    private final int SENDER = 0;
+    private final int RECEIVER = 1;
+    private final int TIME = 3;
 
     //NOTE- Format of data in text files is SourceID DestinationID TimestampFrom0
 
@@ -81,7 +85,7 @@ public class DWInteractionGraph {
     public DWInteractionGraph(DWInteractionGraph inputDWIG, List<Integer> userFilter) {
         List<int[]> newEmailData = new ArrayList<int[]>();
         for (int i = 0; i < inputDWIG.emailData.size(); i++) {
-            if (!(userFilter.contains(inputDWIG.emailData.get(i)[0]) || userFilter.contains(inputDWIG.emailData.get(i)[0]))) {
+            if (!(userFilter.contains(inputDWIG.emailData.get(i)[SENDER]) || userFilter.contains(inputDWIG.emailData.get(i)[SENDER]))) {
                 newEmailData.add(inputDWIG.emailData.get(i));
             }
         }
@@ -107,27 +111,38 @@ public class DWInteractionGraph {
         return interactions.get(userIndex.get(sender))[userIndex.get(receiver)];
     }
 
-
+    /**
+     * Turns email data from array into interactions data in array
+     *
+     * @param emailData
+     */
     private void categorizeEmails(List<int[]> emailData) {
 
         ids.addAll(sendIds);
         ids.addAll(destIds);
 
         for (int i = 0; i < ids.size(); i++) {
-            userIndex.put((int)ids.toArray()[i], i);
+            userIndex.put((int) ids.toArray()[i], i);
         }
 
-        for(int i = 0; i < ids.size(); i++) {
-            int [] dataForUser = new int[ids.size()];
+        for (int i = 0; i < ids.size(); i++) {
+            int[] dataForUser = new int[ids.size()];
             for (int j = 0; j < emailData.size(); j++) {
-                if ((int)ids.toArray()[i]==emailData.get(j)[0]) {
-                    dataForUser[userIndex.get(emailData.get(j)[1])]++;
+                if ((int) ids.toArray()[i] == emailData.get(j)[SENDER]) { // if the current id is the sender of an email
+
+                    // increase the numbers of emails sent to the receiver from the sender by 1
+                    dataForUser[userIndex.get(emailData.get(j)[RECEIVER])]++;
                 }
             }
             interactions.add(dataForUser);
         }
     }
 
+    /**
+     * Turns email string info into array info
+     *
+     * @param emails
+     */
     private void getData(List<String> emails) {
         int sendId = 0;
         int destId = 0;
@@ -158,9 +173,9 @@ public class DWInteractionGraph {
             sendIds.add(sendId);
             destIds.add(destId);
 
-            srcDstTime[0] = sendId;
-            srcDstTime[1] = destId;
-            srcDstTime[2] = timeId;
+            srcDstTime[SENDER] = sendId;
+            srcDstTime[RECEIVER] = destId;
+            srcDstTime[TIME] = timeId;
             emailData.add(srcDstTime);
             counter = 0;
             cont = true;
