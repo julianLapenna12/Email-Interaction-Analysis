@@ -17,7 +17,9 @@ public class DWInteractionGraph {
 
     private final int SENDER = 0;
     private final int RECEIVER = 1;
-    private final int TIME = 3;
+    private final int TIME = 2;
+    private final int LOWER_TIME = 0;
+    private final int UPPER_TIME = 1;
 
     //NOTE- Format of data in text files is SourceID DestinationID TimestampFrom0
 
@@ -64,7 +66,7 @@ public class DWInteractionGraph {
     public DWInteractionGraph(DWInteractionGraph inputDWIG, int[] timeFilter) {
         List<int[]> newEmailData = new ArrayList<int[]>();
         for (int i = 0; i < inputDWIG.emailData.size(); i++) {
-            if (inputDWIG.emailData.get(i)[TIME]> timeFilter[SENDER] && inputDWIG.emailData.get(i)[TIME] < timeFilter[RECEIVER]) {
+            if (inputDWIG.emailData.get(i)[TIME]> timeFilter[LOWER_TIME] && inputDWIG.emailData.get(i)[TIME] < timeFilter[UPPER_TIME]) {
                 newEmailData.add(inputDWIG.emailData.get(i));
             }
         }

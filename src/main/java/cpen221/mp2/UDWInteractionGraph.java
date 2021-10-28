@@ -18,6 +18,8 @@ public class UDWInteractionGraph {
     private final int SENDER = 0;
     private final int RECEIVER = 1;
     private final int TIME = 2;
+    private final int LOWER_TIME = 0;
+    private final int UPPER_TIME = 1;
 
     /* ------- Task 1 ------- */
     /* Building the Constructors */
@@ -60,8 +62,10 @@ public class UDWInteractionGraph {
     public UDWInteractionGraph(UDWInteractionGraph inputUDWIG, int[] timeFilter) {
         List<int[]> newEmailData = new ArrayList<int[]>();
         for (int i = 0; i < inputUDWIG.ArrayEmailData.size(); i++) {
-            if (inputUDWIG.ArrayEmailData.get(i)[TIME]> timeFilter[SENDER] && inputUDWIG.ArrayEmailData.get(i)[TIME] < timeFilter[RECEIVER]) {
+            if (inputUDWIG.ArrayEmailData.get(i)[TIME] >= timeFilter[LOWER_TIME] && inputUDWIG.ArrayEmailData.get(i)[TIME] <= timeFilter[UPPER_TIME]) {
                 newEmailData.add(inputUDWIG.ArrayEmailData.get(i));
+                sendIds.add(inputUDWIG.ArrayEmailData.get(i)[SENDER]);
+                destIds.add(inputUDWIG.ArrayEmailData.get(i)[RECEIVER]);
             }
         }
 
@@ -98,6 +102,10 @@ public class UDWInteractionGraph {
 
         for (int i = 0; i < inputDWIG.emailData.size(); i++) {
             newEmailData.add(inputDWIG.emailData.get(i));
+
+            sendIds.add(inputDWIG.emailData.get(i)[SENDER]);
+            destIds.add(inputDWIG.emailData.get(i)[RECEIVER]);
+
         }
 
         MapEmailData(newEmailData);
@@ -141,6 +149,15 @@ public class UDWInteractionGraph {
             while (cont) {
                 if (emails.get(i).charAt(counter)==' ') {
                     destId = Integer.parseInt(emails.get(i).substring(start, counter));
+                    cont = false;
+                }
+                counter++;
+            }
+            cont = true;
+            start = counter;
+            while (cont) {
+                if (counter == emails.get(i).length()) {
+                    timeId = Integer.parseInt(emails.get(i).substring(start, counter));
                     cont = false;
                 }
                 counter++;
