@@ -54,7 +54,7 @@ public class Task1UDWTests {
         UDWInteractionGraph t = new UDWInteractionGraph(testGraphBase, userFilter);
         Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 1, 2, 3)), t.getUserIDs());
         Assertions.assertEquals(2, t.getEmailCount(0, 1));
-        Assertions.assertEquals(0, t.getEmailCount(0, 3));
+        Assertions.assertEquals(2, t.getEmailCount(0, 3));
     }
 
     @Test

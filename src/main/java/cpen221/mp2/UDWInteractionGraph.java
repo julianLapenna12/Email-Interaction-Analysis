@@ -84,8 +84,10 @@ public class UDWInteractionGraph {
     public UDWInteractionGraph(UDWInteractionGraph inputUDWIG, List<Integer> userFilter) {
         List<int[]> newEmailData = new ArrayList<int[]>();
         for (int i = 0; i < inputUDWIG.ArrayEmailData.size(); i++) {
-            if (!(userFilter.contains(inputUDWIG.ArrayEmailData.get(i)[SENDER]) || userFilter.contains(inputUDWIG.ArrayEmailData.get(i)[RECEIVER]))) {
+            if (userFilter.contains(inputUDWIG.ArrayEmailData.get(i)[SENDER]) || userFilter.contains(inputUDWIG.ArrayEmailData.get(i)[RECEIVER])) {
                 newEmailData.add(inputUDWIG.ArrayEmailData.get(i));
+                sendIds.add(inputUDWIG.ArrayEmailData.get(i)[SENDER]);
+                destIds.add(inputUDWIG.ArrayEmailData.get(i)[RECEIVER]);
             }
         }
 
