@@ -94,7 +94,13 @@ public class UDWInteractionGraph {
      * @param inputDWIG a DWInteractionGraph object
      */
     public UDWInteractionGraph(DWInteractionGraph inputDWIG) {
-        // TODO: Implement this constructor
+        List<int[]> newEmailData = new ArrayList<int[]>();
+
+        for (int i = 0; i < inputDWIG.emailData.size(); i++) {
+            newEmailData.add(inputDWIG.emailData.get(i));
+        }
+
+        MapEmailData(newEmailData);
     }
 
     /**

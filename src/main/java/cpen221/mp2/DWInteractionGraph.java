@@ -8,7 +8,7 @@ import java.util.*;
 public class DWInteractionGraph {
 
     private List<String> emails = new ArrayList<String>();          //Stores all raw email data
-    private List<int []> emailData = new ArrayList<int[]>();        //Stores source id and destination id at corresponding indicies for each email
+    public List<int []> emailData = new ArrayList<int[]>();        //Stores source id and destination id at corresponding indicies for each email
     private List<int []> interactions = new ArrayList<int []>();    //Stores number of interactions between users - number at each index is interactions between user (index of list) and user at index
     private Set<Integer> sendIds = new HashSet<Integer>();          //Stores all ids of people who sent emails
     private Set<Integer> destIds = new HashSet<Integer>();          //Stores all ids of people who received emails
@@ -64,7 +64,7 @@ public class DWInteractionGraph {
     public DWInteractionGraph(DWInteractionGraph inputDWIG, int[] timeFilter) {
         List<int[]> newEmailData = new ArrayList<int[]>();
         for (int i = 0; i < inputDWIG.emailData.size(); i++) {
-            if (inputDWIG.emailData.get(i)[2]> timeFilter[0] && inputDWIG.emailData.get(i)[2] < timeFilter[1]) {
+            if (inputDWIG.emailData.get(i)[TIME]> timeFilter[SENDER] && inputDWIG.emailData.get(i)[TIME] < timeFilter[RECEIVER]) {
                 newEmailData.add(inputDWIG.emailData.get(i));
             }
         }
@@ -85,7 +85,7 @@ public class DWInteractionGraph {
     public DWInteractionGraph(DWInteractionGraph inputDWIG, List<Integer> userFilter) {
         List<int[]> newEmailData = new ArrayList<int[]>();
         for (int i = 0; i < inputDWIG.emailData.size(); i++) {
-            if (!(userFilter.contains(inputDWIG.emailData.get(i)[SENDER]) || userFilter.contains(inputDWIG.emailData.get(i)[SENDER]))) {
+            if (!(userFilter.contains(inputDWIG.emailData.get(i)[SENDER]) || userFilter.contains(inputDWIG.emailData.get(i)[RECEIVER]))) {
                 newEmailData.add(inputDWIG.emailData.get(i));
             }
         }
