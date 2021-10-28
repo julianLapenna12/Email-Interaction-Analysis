@@ -126,7 +126,10 @@ public class UDWInteractionGraph {
      * receiver in this DWInteractionGraph.
      */
     public int getEmailCount(int sender, int receiver) {
-        return interactions.get(userIndex.get(sender))[userIndex.get(receiver)];
+        if (userIndex.containsKey(sender) && userIndex.containsKey(receiver))
+            return interactions.get(userIndex.get(sender))[userIndex.get(receiver)];
+
+        return 0;
     }
 
     private void stringDataToArray(List<String> emails) {
