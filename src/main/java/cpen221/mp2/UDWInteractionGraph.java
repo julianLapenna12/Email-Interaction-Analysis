@@ -8,12 +8,16 @@ import java.util.*;
 public class UDWInteractionGraph {
 
     private List<String> StringEmails = new ArrayList<String>();          //Stores all raw email data
-    private List<int []> emailData = new ArrayList<int[]>();        //Stores source id and destination id at corresponding indicies for each email
+    private List<int []> ArrayEmailData = new ArrayList<int[]>();        //Stores source id and destination id at corresponding indicies for each email
     private List<int []> interactions = new ArrayList<int []>();    //Stores number of interactions between users - number at each index is interactions between user (index of list) and user at index
     private Set<Integer> sendIds = new HashSet<Integer>();          //Stores all ids of people who sent emails
     private Set<Integer> destIds = new HashSet<Integer>();          //Stores all ids of people who received emails
     private Set<Integer> ids = new HashSet<Integer>();
     private Map<Integer, Integer> userIndex = new HashMap<Integer, Integer>();
+
+    private final int SENDER = 0;
+    private final int RECEIVER = 1;
+    private final int TIME = 2;
 
     /* ------- Task 1 ------- */
     /* Building the Constructors */
@@ -39,6 +43,7 @@ public class UDWInteractionGraph {
         }
 
         stringDataToArray(StringEmails);
+        MapEmailData(ArrayEmailData);
     }
 
     /**
@@ -53,8 +58,14 @@ public class UDWInteractionGraph {
      *                   t0 <= t <= t1 range.
      */
     public UDWInteractionGraph(UDWInteractionGraph inputUDWIG, int[] timeFilter) {
-        // TODO: Implement this constructor
-    }
+        List<int[]> newEmailData = new ArrayList<int[]>();
+        for (int i = 0; i < inputUDWIG.ArrayEmailData.size(); i++) {
+            if (inputUDWIG.ArrayEmailData.get(i)[TIME]> timeFilter[SENDER] && inputUDWIG.ArrayEmailData.get(i)[TIME] < timeFilter[RECEIVER]) {
+                newEmailData.add(inputUDWIG.ArrayEmailData.get(i));
+            }
+        }
+
+        MapEmailData(newEmailData);    }
 
     /**
      * Creates a new UDWInteractionGraph from a UDWInteractionGraph object
@@ -67,7 +78,14 @@ public class UDWInteractionGraph {
      *                   nor the receiver exist in userFilter.
      */
     public UDWInteractionGraph(UDWInteractionGraph inputUDWIG, List<Integer> userFilter) {
-        // TODO: Implement this constructor
+        List<int[]> newEmailData = new ArrayList<int[]>();
+        for (int i = 0; i < inputUDWIG.ArrayEmailData.size(); i++) {
+            if (!(userFilter.contains(inputUDWIG.ArrayEmailData.get(i)[SENDER]) || userFilter.contains(inputUDWIG.ArrayEmailData.get(i)[RECEIVER]))) {
+                newEmailData.add(inputUDWIG.ArrayEmailData.get(i));
+            }
+        }
+
+        MapEmailData(newEmailData);
     }
 
     /**
@@ -83,10 +101,7 @@ public class UDWInteractionGraph {
      * @return a Set of Integers, where every element in the set is a User ID
      * in this DWInteractionGraph.
      */
-    public Set<Integer> getUserIDs() {
-        // TODO: Implement this getter method
-        return null;
-    }
+    public Set<Integer> getUserIDs() { return ids; }
 
     /**
      * @param sender the User ID of the sender in the email transaction.
@@ -95,8 +110,7 @@ public class UDWInteractionGraph {
      * receiver in this DWInteractionGraph.
      */
     public int getEmailCount(int sender, int receiver) {
-        // TODO: Implement this getter method
-        return 0;
+        return interactions.get(userIndex.get(sender))[userIndex.get(receiver)];
     }
 
     private void stringDataToArray(List<String> emails) {
@@ -129,16 +143,16 @@ public class UDWInteractionGraph {
             sendIds.add(sendId);
             destIds.add(destId);
 
-            srcDstTime[0] = sendId;
-            srcDstTime[1] = destId;
-            srcDstTime[2] = timeId;
-            emailData.add(srcDstTime);
+            srcDstTime[SENDER] = sendId;
+            srcDstTime[RECEIVER] = destId;
+            srcDstTime[TIME] = timeId;
+            ArrayEmailData.add(srcDstTime);
             counter = 0;
             cont = true;
         }
     }
 
-    private void categorizeEmails(List<int[]> emailData) {
+    private void MapEmailData(List<int[]> emailData) {
 
         ids.addAll(sendIds);
         ids.addAll(destIds);
@@ -147,15 +161,21 @@ public class UDWInteractionGraph {
             userIndex.put((int)ids.toArray()[i], i);
         }
 
-        for(int i = 0; i < ids.size(); i++) {
-            int [] dataForUser = new int[ids.size()];
+        for (int i = 0; i < ids.size(); i++) {
+            int[] dataForUser = new int[ids.size()];
             for (int j = 0; j < emailData.size(); j++) {
-                if ((int)ids.toArray()[i]==emailData.get(j)[0]) {
-                    dataForUser[userIndex.get(emailData.get(j)[1])]++;
+                if ((int) ids.toArray()[i] == emailData.get(j)[SENDER]) {
+                    dataForUser[userIndex.get(emailData.get(j)[RECEIVER])]++;
+                }
+
+                if ((int) ids.toArray()[i] == emailData.get(j)[RECEIVER]) {
+                    dataForUser[userIndex.get(emailData.get(j)[SENDER])]++;
                 }
             }
             interactions.add(dataForUser);
         }
+
+
     }
 
     /* ------- Task 2 ------- */
