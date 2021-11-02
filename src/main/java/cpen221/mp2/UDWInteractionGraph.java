@@ -102,11 +102,11 @@ public class UDWInteractionGraph {
     public UDWInteractionGraph(DWInteractionGraph inputDWIG) {
         List<int[]> newEmailData = new ArrayList<int[]>();
 
-        for (int i = 0; i < inputDWIG.emailData.size(); i++) {
-            newEmailData.add(inputDWIG.emailData.get(i));
+        for (int i = 0; i < inputDWIG.getEmailData().size(); i++) {
+            newEmailData.add(inputDWIG.getEmailData().get(i));
 
-            sendIds.add(inputDWIG.emailData.get(i)[SENDER]);
-            destIds.add(inputDWIG.emailData.get(i)[RECEIVER]);
+            sendIds.add(inputDWIG.getEmailData().get(i)[SENDER]);
+            destIds.add(inputDWIG.getEmailData().get(i)[RECEIVER]);
 
         }
 
