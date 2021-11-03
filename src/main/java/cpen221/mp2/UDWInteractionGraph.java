@@ -14,6 +14,8 @@ public class UDWInteractionGraph {
     private Set<Integer> destIds = new HashSet<Integer>();          //Stores all ids of people who received emails
     private Set<Integer> ids = new HashSet<Integer>();
     private Map<Integer, Integer> userIndex = new HashMap<Integer, Integer>();
+    private HashSet<Integer>[] arrayOfComponentSets;
+    private int nodes;
 
     private final int SENDER = 0;
     private final int RECEIVER = 1;
@@ -46,6 +48,8 @@ public class UDWInteractionGraph {
 
         stringDataToArray(StringEmails);
         MapEmailData(ArrayEmailData);
+
+        initializeTask3Data();
     }
 
     /**
@@ -69,7 +73,9 @@ public class UDWInteractionGraph {
             }
         }
 
-        MapEmailData(newEmailData);    }
+        MapEmailData(newEmailData);
+        initializeTask3Data();
+    }
 
     /**
      * Creates a new UDWInteractionGraph from a UDWInteractionGraph object
@@ -92,6 +98,7 @@ public class UDWInteractionGraph {
         }
 
         MapEmailData(newEmailData);
+        initializeTask3Data();
     }
 
     /**
@@ -111,6 +118,7 @@ public class UDWInteractionGraph {
         }
 
         MapEmailData(newEmailData);
+        initializeTask3Data();
     }
 
     /**
@@ -192,12 +200,16 @@ public class UDWInteractionGraph {
         for (int i = 0; i < ids.size(); i++) {
             int[] dataForUser = new int[ids.size()];
             for (int j = 0; j < emailData.size(); j++) {
-                if ((int) ids.toArray()[i] == emailData.get(j)[SENDER]) {
+                if (emailData.get(j)[SENDER] == emailData.get(j)[RECEIVER]) {
                     dataForUser[userIndex.get(emailData.get(j)[RECEIVER])]++;
-                }
+                } else {
+                    if ((int) ids.toArray()[i] == emailData.get(j)[SENDER]) {
+                        dataForUser[userIndex.get(emailData.get(j)[RECEIVER])]++;
+                    }
 
-                if ((int) ids.toArray()[i] == emailData.get(j)[RECEIVER]) {
-                    dataForUser[userIndex.get(emailData.get(j)[SENDER])]++;
+                    if ((int) ids.toArray()[i] == emailData.get(j)[RECEIVER]) {
+                        dataForUser[userIndex.get(emailData.get(j)[SENDER])]++;
+                    }
                 }
             }
             interactions.add(dataForUser);
@@ -248,17 +260,14 @@ public class UDWInteractionGraph {
      *    components in the UDWInteractionGraph object.
      */
     public int NumberOfComponents() {
+        return nodes;
+    }
 
-        HashSet<Integer>[] arrayOfComponentSets = new HashSet[interactions.size()];
-
-        //listOfComponentSets.add(new HashSet<>().add(interactions[]))
-
+    private void initializeTask3Data() {
+        arrayOfComponentSets = new HashSet[interactions.size()];
         arrayOfComponentSets = componentSets();
         arrayOfComponentSets = groupSets(arrayOfComponentSets);
-
-        int nodes = countNodes(arrayOfComponentSets);
-
-        return nodes;
+        nodes = countNodes(arrayOfComponentSets);
     }
 
     /**
@@ -278,7 +287,7 @@ public class UDWInteractionGraph {
 
     private HashSet<Integer>[] groupSets(HashSet<Integer>[] arrayOfSets) {
         HashSet<Integer>[] groupedSets;
-        groupedSets = arrayOfSets;
+        groupedSets = arrayOfSets; // this might be redundant
 
         for(int i = 0; i < groupedSets.length; i++) { // sort through each set
             if (groupedSets[i].size() > 0) {
@@ -334,7 +343,13 @@ public class UDWInteractionGraph {
      * @return whether a path exists between the two users
      */
     public boolean PathExists(int userID1, int userID2) {
-        // TODO: Implement this method
+        for(HashSet<Integer> graphComponent : arrayOfComponentSets) {
+            if(graphComponent.contains(userIndex.get(userID1)) && graphComponent.contains(userIndex.get(userID2))) {
+                System.out.println("true");
+                return true;
+            }
+        }
+        System.out.println("false");
         return false;
     }
 
