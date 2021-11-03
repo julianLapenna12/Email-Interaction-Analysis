@@ -41,8 +41,6 @@ public class DWInteractionGraph {
      *                 directory containing email interactions
      */
     public DWInteractionGraph(String fileName) {
-        // TODO: Implement this constructor
-
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
@@ -54,7 +52,7 @@ public class DWInteractionGraph {
             System.out.println("Problem reading file!");
         }
 
-        getData(emails);
+        emailData = getData(emails);
         emailGraph = categorizeEmails(emailData);
 
     }
@@ -80,6 +78,7 @@ public class DWInteractionGraph {
                 newEmailData.add(email);
             }
         }
+        emailData = newEmailData;
         emailGraph = categorizeEmails(newEmailData);
     }
 
@@ -94,10 +93,15 @@ public class DWInteractionGraph {
      *                   nor the receiver exist in userFilter.
      */
     public DWInteractionGraph(DWInteractionGraph inputDWIG, List<Integer> userFilter) {
+        List<int[]> newEmailData = new ArrayList<>();
         List<int[]> otherEmailData = inputDWIG.getEmailData();
-        otherEmailData.stream().filter(
-                e -> userFilter.contains(e[SENDER]) || userFilter.contains(e[RECEIVER])
-        );
+
+        for(int[] email : otherEmailData){
+            if(!(userFilter.contains(email[SENDER]) || userFilter.contains(email[RECEIVER]))){
+                newEmailData.add(email);
+            }
+        }
+        emailData = newEmailData;
         emailGraph = categorizeEmails(otherEmailData);
     }
 
@@ -129,27 +133,37 @@ public class DWInteractionGraph {
         ids.addAll(sendIds);
         ids.addAll(destIds);
         for(int[] email : emailData){
-            int sender = email[SENDER];
-            int receiver = email[RECEIVER];
-            int time = email[TIME];
-            if(graph.containsKey(sender)){
-                if(graph.get(sender).containsKey(receiver)){
-                    graph.get(sender).get(receiver).add(time);
-                }
-                else {
-                    ArrayList<Integer> timeList = new ArrayList<>();
-                    timeList.add(time);
-                    graph.get(sender).put(receiver,timeList);
-                }
-            }
-            else{
-                ArrayList<Integer> timeList = new ArrayList<>();
-                HashMap<Integer, List<Integer>> receiverData = new HashMap<>();
-                timeList.add(time);
-                receiverData.put(receiver, timeList);
-                graph.put(sender, receiverData);
-            }
+            graph = addEmail(email, graph);
+        }
+        return graph;
+    }
 
+    /**
+     * Adds information from a single Email interaction to the interaction Graph
+     * @param email an int array representing a single email, where the first element is sender ID, second is receiver, and third is the time.
+     * @param graph a Map mapping each sender to a map of Receivers and time list of time stamps/
+     * @return the edited copy of the graph
+     */
+    private Map<Integer, Map<Integer, List<Integer>>> addEmail(int[] email, Map<Integer, Map<Integer, List<Integer>>> graph){
+        int sender = email[SENDER];
+        int receiver = email[RECEIVER];
+        int time = email[TIME];
+        if(graph.containsKey(sender)){
+            if(graph.get(sender).containsKey(receiver)){
+                graph.get(sender).get(receiver).add(time);
+            }
+            else {
+                ArrayList<Integer> timeList = new ArrayList<>();
+                timeList.add(time);
+                graph.get(sender).put(receiver,timeList);
+            }
+        }
+        else{
+            ArrayList<Integer> timeList = new ArrayList<>();
+            HashMap<Integer, List<Integer>> receiverData = new HashMap<>();
+            timeList.add(time);
+            receiverData.put(receiver, timeList);
+            graph.put(sender, receiverData);
         }
         return graph;
     }
@@ -157,9 +171,13 @@ public class DWInteractionGraph {
     /**
      * Turns email string info into array info
      *
-     * @param emails
+     * @param emails is a list of strings representing the raw data of the email information, where each line is a string
+     *              containing 3 integer values separated by spaces, representing sender ID, receiver ID, and the Time the email was sent.
+     * @return an arrayList of int triples, where each int array represents the sender ID, receiver ID, and time sent of each email.
+     * Effects: adds all the IDS of senders and receivers to sets of user IDs.
      */
-    private void getData(List<String> emails) {
+    private ArrayList<int[]> getData(List<String> emails) {
+        ArrayList<int[]> data = new ArrayList<>();
         int sendId, destId, timeId;
         for(String email : emails) {
             String[] srcDstTimeStr  = email.split(" ");
@@ -168,8 +186,9 @@ public class DWInteractionGraph {
             timeId = Integer.parseInt(srcDstTimeStr[TIME]);
             sendIds.add(sendId);
             destIds.add(destId);
-            emailData.add(new int[]{sendId, destId, timeId});
+            data.add(new int[]{sendId, destId, timeId});
         }
+        return data;
     }
 
     /**
