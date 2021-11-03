@@ -248,8 +248,41 @@ public class UDWInteractionGraph {
      *    components in the UDWInteractionGraph object.
      */
     public int NumberOfComponents() {
-        // TODO: Implement this method
+
+        HashSet<Integer>[] arrayOfComponentSets = new HashSet[interactions.size()];
+
+        //listOfComponentSets.add(new HashSet<>().add(interactions[]))
+
+        arrayOfComponentSets = componentSets();
+
+
         return 0;
+    }
+
+    /**
+     * Breaks up the interactions into an array of sets where each set contains
+     * the IDs of all the people who've interacted with associated person
+     *
+     * The associated person is the array index of the sets
+     *
+     * @return an array of sets where each index i of the array holds a set of
+     * people that person i has interacted with
+     */
+    private HashSet<Integer>[] componentSets() {
+        HashSet<Integer>[] componentSets = new HashSet[interactions.size()];
+
+        for(int i = 0; i < interactions.size(); i++) { // going through each person
+            for(int j = 0; j < interactions.size(); j++) { // and if they have an interaction with someone
+                if(interactions.get(i)[j] != 0) {
+
+                    // add both of them to person i's set of people interacted with
+                    componentSets[i].add(i);
+                    componentSets[i].add(j);
+                }
+            }
+        }
+
+        return componentSets;
     }
 
     /**
