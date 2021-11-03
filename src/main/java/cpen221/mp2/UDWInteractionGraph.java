@@ -254,9 +254,50 @@ public class UDWInteractionGraph {
         //listOfComponentSets.add(new HashSet<>().add(interactions[]))
 
         arrayOfComponentSets = componentSets();
+        arrayOfComponentSets = groupSets(arrayOfComponentSets);
 
+        int nodes = countNodes(arrayOfComponentSets);
 
-        return 0;
+        return nodes;
+    }
+
+    /**
+     * Finds the number of components on a graph. Assumes that the graph has already
+     * been grouped ( using groupSets() )
+     *
+     * @param arrayOfSets an array of Hashsets containing a sorted graph
+     * @return the number of unique components
+     */
+    private int countNodes(HashSet<Integer>[] arrayOfSets){
+        int nodes = 0;
+        for(HashSet<Integer> set : arrayOfSets) {
+            if (set.size() > 0) nodes++;
+        }
+        return nodes;
+    }
+
+    private HashSet<Integer>[] groupSets(HashSet<Integer>[] arrayOfSets) {
+        HashSet<Integer>[] groupedSets;
+        groupedSets = arrayOfSets;
+
+        for(int i = 0; i < groupedSets.length; i++) { // sort through each set
+            if (groupedSets[i].size() > 0) {
+                HashSet<Integer> temp = new HashSet<>();
+                temp.addAll(groupedSets[i]);
+                for (Integer j : temp) { // check each person interacted with the set
+                    for (int k = 0; k < groupedSets.length; k++) { // compare if that person is in another interaction set
+                        if (k != i) {
+                            if (groupedSets[k].contains(j)) { // if they are
+                                groupedSets[i].addAll(groupedSets[k]); // add all the elements into the original set
+                                groupedSets[k].removeAll(groupedSets[k]); // remove all the elements from the secondary set
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return groupedSets;
     }
 
     /**
@@ -272,6 +313,8 @@ public class UDWInteractionGraph {
         HashSet<Integer>[] componentSets = new HashSet[interactions.size()];
 
         for(int i = 0; i < interactions.size(); i++) { // going through each person
+            componentSets[i] = new HashSet<>();
+
             for(int j = 0; j < interactions.size(); j++) { // and if they have an interaction with someone
                 if(interactions.get(i)[j] != 0) {
 
