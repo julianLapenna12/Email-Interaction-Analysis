@@ -9,18 +9,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DWInteractionGraph {
 
     private List<String> emails = new ArrayList<String>();          //Stores all raw email data
-    private List<int []> emailData = new ArrayList<int[]>();        //Stores source id and destination id at corresponding indicies for each email
-    private List<int []> interactions = new ArrayList<int []>();    //Stores number of interactions between users - number at each index is interactions between user (index of list) and user at index
-    private Set<Integer> sendIds = new HashSet<Integer>();          //Stores all ids of people who sent emails
-    private Set<Integer> destIds = new HashSet<Integer>();          //Stores all ids of people who received emails
-    private Set<Integer> ids = new HashSet<Integer>();
-    private Map<Integer, Integer> userIndex = new HashMap<Integer, Integer>();
+    private List<int []> emailData;        //Stores source id and destination id at corresponding indicies for each email
+    private Set<Integer> ids;
 
-    //Joels Experimental New Implementation, creates a map, mapping each ID to a history of interactions, which is a map of the receiver IDs to the time sent
     private Map<Integer, Map<Integer, List<Integer>>> emailGraph;
     private TreeSet<int[]> receiverMetric = new TreeSet<>(Comparator.comparingInt(o -> o[1]));
     private TreeSet<int[]> senderMetric = new TreeSet<>(Comparator.comparingInt(o -> o[1]));
-
 
     private final int SENDER = 0;
     private final int RECEIVER = 1;
@@ -53,6 +47,7 @@ public class DWInteractionGraph {
         }
 
         emailData = getData(emails);
+        ids = createIDSet(emailData);
         emailGraph = categorizeEmails(emailData);
 
     }
@@ -79,6 +74,7 @@ public class DWInteractionGraph {
             }
         }
         emailData = newEmailData;
+        ids = createIDSet(emailData);
         emailGraph = categorizeEmails(newEmailData);
     }
 
@@ -97,11 +93,12 @@ public class DWInteractionGraph {
         List<int[]> otherEmailData = inputDWIG.getEmailData();
 
         for(int[] email : otherEmailData){
-            if(!(userFilter.contains(email[SENDER]) || userFilter.contains(email[RECEIVER]))){
+            if((userFilter.contains(email[SENDER]) || userFilter.contains(email[RECEIVER]))){
                 newEmailData.add(email);
             }
         }
         emailData = newEmailData;
+        ids = createIDSet(emailData);
         emailGraph = categorizeEmails(otherEmailData);
     }
 
@@ -120,7 +117,10 @@ public class DWInteractionGraph {
      * receiver in this DWInteractionGraph.
      */
     public int getEmailCount(int sender, int receiver) {
-        return interactions.get(userIndex.get(sender))[userIndex.get(receiver)];
+        if(!emailGraph.containsKey(sender) || !emailGraph.get(sender).containsKey(receiver)){
+            return 0;
+        }
+        return emailGraph.get(sender).get(receiver).size();
     }
 
     /**
@@ -130,14 +130,20 @@ public class DWInteractionGraph {
      */
     private Map<Integer, Map<Integer, List<Integer>>> categorizeEmails(List<int[]> emailData) {
         Map<Integer, Map<Integer, List<Integer>>> graph = new HashMap<>();
-        ids.addAll(sendIds);
-        ids.addAll(destIds);
         for(int[] email : emailData){
             graph = addEmail(email, graph);
         }
         return graph;
     }
 
+    private Set<Integer> createIDSet(List<int[]> emails){
+        HashSet<Integer> allIDs = new HashSet<>();
+        for(int[] email : emails){
+            allIDs.add(email[SENDER]);
+            allIDs.add(email[RECEIVER]);
+        }
+        return allIDs;
+    }
     /**
      * Adds information from a single Email interaction to the interaction Graph
      * @param email an int array representing a single email, where the first element is sender ID, second is receiver, and third is the time.
@@ -184,8 +190,6 @@ public class DWInteractionGraph {
             sendId = Integer.parseInt(srcDstTimeStr[SENDER]);
             destId = Integer.parseInt(srcDstTimeStr[RECEIVER]);
             timeId = Integer.parseInt(srcDstTimeStr[TIME]);
-            sendIds.add(sendId);
-            destIds.add(destId);
             data.add(new int[]{sendId, destId, timeId});
         }
         return data;
@@ -238,13 +242,87 @@ public class DWInteractionGraph {
      * returns [0, 0, 0].
      */
     public int[] ReportOnUser(int userID) {
+        Set<Integer> interactions = new HashSet<>();
+        int[] userMetric = new int[]{0,0,0};
+
+        if(!ids.contains(userID)){
+            return new int[]{0,0,0};
+        }
+        interactions.addAll(getRecipientSet(userID));
+        interactions.addAll(getSenderSet(userID));
+
+        userMetric[0] = getNumEmailSent(userID);
+
+        userMetric[1] = getNumEmailReceived(userID);
+
+        userMetric[2] = interactions.size();
+        return userMetric;
+    }
+
+    private int getNumEmailSent(int userID){
+        if(!emailGraph.containsKey(userID)){
+            return 0;
+        }
         Map<Integer, List<Integer>> history = emailGraph.get(userID);
-        int[] userMetric = new int[3];
-        AtomicInteger numSent = new AtomicInteger();
-        history.forEach((user, times) -> numSent.addAndGet(times.size()));
-        userMetric[2] = history.size();
-        userMetric[0] = numSent.get();
-        return null;
+        int numSent = 0;
+        for(int recipient : history.keySet()){
+            numSent+= history.get(recipient).size();
+        }
+        return numSent;
+    }
+
+    private int getNumEmailReceived(int userID){
+        Map<Integer, Map<Integer, List<Integer>>> receiverGraph = createReceiverGraph(emailGraph, userID);
+        if(receiverGraph.isEmpty()){
+            return 0;
+        }
+        int numReceived = 0;
+        for(int sender : receiverGraph.keySet()){
+            numReceived += receiverGraph.get(sender).get(userID).size();
+        }
+        return numReceived;
+    }
+
+    private Set<Integer> getRecipientSet(int userID){
+        Set<Integer> recipients = new HashSet<>();
+        Map<Integer, List<Integer>> history = emailGraph.get(userID);
+        if(!emailGraph.containsKey(userID)){
+            return recipients;
+        }
+        for(int recipient : history.keySet()){
+            recipients.add(recipient);
+        }
+        return recipients;
+    }
+
+    private Set<Integer> getSenderSet(int userID){
+        Set<Integer> senders = new HashSet<>();
+        Map<Integer, Map<Integer, List<Integer>>> receiverGraph = createReceiverGraph(emailGraph, userID);
+        if(receiverGraph.isEmpty()){
+            return senders;
+        }
+        for(int sender : receiverGraph.keySet()){
+            senders.add(sender);
+        }
+        return senders;
+
+    }
+    /**
+     * Creates a sub-graph of the total email graph, representing all the emails sent to a specified ID
+     * @param graph the total email graph from which the sub-graph will be constructed
+     * @param id is the id of the recipient from whose senders and emails the graph will be made
+     * @return a directed graph representing all emails sent to a user.
+     */
+    private Map<Integer, Map<Integer, List<Integer>>> createReceiverGraph(Map<Integer, Map<Integer, List<Integer>>> graph, int id){
+        Map<Integer, Map<Integer, List<Integer>>> receiverGraph = new HashMap<>();
+        for(int sender : graph.keySet()){
+            if(graph.get(sender).containsKey(id) ){
+                Map<Integer, List<Integer>> received = new HashMap<>();
+                received.put(id, new ArrayList<>(graph.get(sender).get(id)));
+                receiverGraph.put(sender, received);
+            }
+        }
+        return receiverGraph;
     }
 
     /**
