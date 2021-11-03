@@ -240,8 +240,33 @@ public class UDWInteractionGraph {
      * returns [0, 0].
      */
     public int[] ReportOnUser(int userID) {
-        // TODO: Implement this method
-        return null;
+        int[] userInformation = new int[2];
+
+        userInformation[0] = getUserInteractionCount(userID);
+        userInformation[1] = uniqueUserInteractions(userID);
+        return userInformation;
+    }
+
+    private int uniqueUserInteractions(int userID) {
+
+        int count = 0;
+        for(int j = 0; j < interactions.size(); j++) { // and if they have an interaction with someone
+            if(interactions.get(userIndex.get(userID))[j] != 0) {
+
+                count++;
+            }
+        }
+
+        return count;
+
+    }
+
+    private int getUserInteractionCount(int userID) {
+        int count = 0;
+        for(int i = 0; i < interactions.size(); i++) {
+            count += interactions.get(userIndex.get(userID))[i];
+        }
+        return count;
     }
 
     /**
