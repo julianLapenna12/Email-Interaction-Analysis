@@ -13,14 +13,25 @@ public class DWInteractionGraph {
     private Set<Integer> ids;
 
     private Map<Integer, Map<Integer, List<Integer>>> emailGraph;
-    private TreeSet<int[]> receiverMetric = new TreeSet<>(Comparator.comparingInt(o -> o[1]));
-    private TreeSet<int[]> senderMetric = new TreeSet<>(Comparator.comparingInt(o -> o[1]));
+    private TreeSet<EmailUser> senderMetric = new TreeSet<>((u1, u2) -> {
+        if(u1.getNumSends() == u2.getNumSends()){
+            return u2.getId() - u1.getId();
+        }
+        else return u1.getNumSends() - u2.getNumSends();
+    });
+    private TreeSet<EmailUser> receiverMetric = new TreeSet<>((u1, u2) -> {
+        if(u1.getNumReceives() == u2.getNumReceives()){
+            return u2.getId() - u1.getId();
+        }
+        else return u1.getNumReceives() - u2.getNumReceives() ;
+    });
 
     private final int SENDER = 0;
     private final int RECEIVER = 1;
     private final int TIME = 2;
     private final int LOWER_TIME = 0;
     private final int UPPER_TIME = 1;
+
 
     //NOTE- Format of data in text files is SourceID DestinationID TimestampFrom0
 
@@ -49,7 +60,7 @@ public class DWInteractionGraph {
         emailData = getData(emails);
         ids = createIDSet(emailData);
         emailGraph = categorizeEmails(emailData);
-
+        createMetrics(emailData);
     }
 
     /**
@@ -76,6 +87,7 @@ public class DWInteractionGraph {
         emailData = newEmailData;
         ids = createIDSet(emailData);
         emailGraph = categorizeEmails(newEmailData);
+        createMetrics(emailData);
     }
 
     /**
@@ -100,6 +112,7 @@ public class DWInteractionGraph {
         emailData = newEmailData;
         ids = createIDSet(emailData);
         emailGraph = categorizeEmails(otherEmailData);
+        createMetrics(emailData);
     }
 
     /**
@@ -144,6 +157,29 @@ public class DWInteractionGraph {
         }
         return allIDs;
     }
+
+    /**
+     * Takes the list of all emails sents and uses it to create orderings of all users based on number of emails sent and received.
+     * @param emails a 3 valued integer list of all email data, containing sender and receiver ids and the time sent
+     */
+    private void createMetrics(List<int[]> emails){
+        for(int[] email : emails){
+            if(receiverMetric.contains(new EmailUser(email[RECEIVER]))){
+                receiverMetric.stream().forEach(u -> {
+                    if(u.getId() == email[RECEIVER]){u.receiveEmail(email[SENDER]);}
+                });
+            }
+            else receiverMetric.add(new EmailUser(email[RECEIVER], SendOrReceive.RECEIVE, email[SENDER]));
+
+            if(senderMetric.contains(new EmailUser(email[SENDER]))){
+                senderMetric.stream().forEach(u -> {
+                    if(u.getId() == email[SENDER]){u.sendEmail(email[RECEIVER]);}
+                });
+            }
+            else senderMetric.add(new EmailUser(email[SENDER], SendOrReceive.SEND, email[RECEIVER]));
+        }
+    }
+
     /**
      * Adds information from a single Email interaction to the interaction Graph
      * @param email an int array representing a single email, where the first element is sender ID, second is receiver, and third is the time.
@@ -259,6 +295,11 @@ public class DWInteractionGraph {
         return userMetric;
     }
 
+    /**
+     * Given a user ID reports on the number of emails they sent
+     * @param userID The user id for which the report will be created.
+     * @return an integer number of emails sent, if UserID did not send any emails then returns 0;
+     */
     private int getNumEmailSent(int userID){
         if(!emailGraph.containsKey(userID)){
             return 0;
@@ -271,6 +312,11 @@ public class DWInteractionGraph {
         return numSent;
     }
 
+    /**
+     * Given a user ID reports on the number of emails they received.
+     * @param userID The user id for which the report will be created.
+     * @return an integer number of emails received, if UserID did not receive any emails then returns 0;
+     */
     private int getNumEmailReceived(int userID){
         Map<Integer, Map<Integer, List<Integer>>> receiverGraph = createReceiverGraph(emailGraph, userID);
         if(receiverGraph.isEmpty()){
@@ -283,6 +329,12 @@ public class DWInteractionGraph {
         return numReceived;
     }
 
+    /**
+     * Given a user id reports all the users who received emails from them
+     * @param userID The user id for which the report will be created.
+     * @return a set of user Id's corresponding to all the users who received emails from the specified user,
+     * returns an empty set if the user sent no emails.
+     */
     private Set<Integer> getRecipientSet(int userID){
         Set<Integer> recipients = new HashSet<>();
         Map<Integer, List<Integer>> history = emailGraph.get(userID);
@@ -295,6 +347,12 @@ public class DWInteractionGraph {
         return recipients;
     }
 
+    /**
+     * Given a user id reports all users who sent emails to them.
+     * @param userID The user id for which the report will be created.
+     * @return a set of user Id's corresponding to all the users who sent emails to the specified user,
+     * returns an empty set if the user received no emails.
+     */
     private Set<Integer> getSenderSet(int userID){
         Set<Integer> senders = new HashSet<>();
         Map<Integer, Map<Integer, List<Integer>>> receiverGraph = createReceiverGraph(emailGraph, userID);
@@ -334,8 +392,20 @@ public class DWInteractionGraph {
      * tie, secondarily sorts the tied User IDs in ascending order.
      */
     public int NthMostActiveUser(int N, SendOrReceive interactionType) {
-        // TODO: Implement this method
-        return -1;
+        TreeSet<EmailUser> ordering;
+        EmailUser user;
+        if(interactionType.equals(SendOrReceive.SEND)){
+            ordering = senderMetric;
+        }
+        else ordering = receiverMetric;
+        if(ordering.size() < N){
+            return -1;
+        }
+        user = ordering.last();
+        for(int i = 1; i<N; i++){
+            user = ordering.lower(user);
+        }
+        return user.getId();
     }
 
     /* ------- Task 3 ------- */
