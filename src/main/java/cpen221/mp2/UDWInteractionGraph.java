@@ -7,11 +7,13 @@ import java.util.*;
 
 public class UDWInteractionGraph {
 
-    private List<String> StringEmails = new ArrayList<String>();          //Stores all raw email data
-    private List<int []> ArrayEmailData = new ArrayList<int[]>();        //Stores source id and destination id at corresponding indicies for each email
-    private List<int []> interactions = new ArrayList<int []>();    //Stores number of interactions between users - number at each index is interactions between user (index of list) and user at index
-    private Set<Integer> sendIds = new HashSet<Integer>();          //Stores all ids of people who sent emails
-    private Set<Integer> destIds = new HashSet<Integer>();          //Stores all ids of people who received emails
+    private List<String> StringEmails = new ArrayList<String>();                 //Stores all raw email data
+    private List<int []> ArrayEmailData = new ArrayList<int[]>();           //Stores source id and destination id at corresponding indicies for each email
+    private Map<Integer, Integer> userInteractionCounts = new HashMap<>();  //Stores users mapped to their interaction counts
+    private ArrayList<Integer> orderUsers = new ArrayList<>();
+    private List<int []> interactions = new ArrayList<int []>();            //Stores number of interactions between users - number at each index is interactions between user (index of list) and user at index
+    private Set<Integer> sendIds = new HashSet<Integer>();                        //Stores all ids of people who sent emails
+    private Set<Integer> destIds = new HashSet<Integer>();                        //Stores all ids of people who received emails
     private Set<Integer> ids = new HashSet<Integer>();
     private Map<Integer, Integer> userIndex = new HashMap<Integer, Integer>();
     private HashSet<Integer>[] arrayOfComponentSets;
@@ -46,8 +48,9 @@ public class UDWInteractionGraph {
 
         stringDataToArray(StringEmails);
         MapEmailData(ArrayEmailData);
-
         initializeTask3Data();
+        mapUsers();
+        activeUsers();
     }
 
     /**
@@ -74,6 +77,8 @@ public class UDWInteractionGraph {
 
         MapEmailData(newEmailData);
         initializeTask3Data();
+        mapUsers();
+        activeUsers();
     }
 
     /**
@@ -99,6 +104,8 @@ public class UDWInteractionGraph {
 
         MapEmailData(newEmailData);
         initializeTask3Data();
+        mapUsers();
+        activeUsers();
     }
 
     /**
@@ -114,11 +121,12 @@ public class UDWInteractionGraph {
             ArrayEmailData = inputDWIG.getEmailData();
             sendIds.add(inputDWIG.getEmailData().get(i)[SENDER]);
             destIds.add(inputDWIG.getEmailData().get(i)[RECEIVER]);
-
         }
 
         MapEmailData(newEmailData);
         initializeTask3Data();
+        mapUsers();
+        activeUsers();
     }
 
     /**
@@ -214,8 +222,6 @@ public class UDWInteractionGraph {
             }
             interactions.add(dataForUser);
         }
-
-
     }
 
     /* ------- Task 2 ------- */
@@ -265,13 +271,17 @@ public class UDWInteractionGraph {
         return count;
     }
 
-    private int getUserInteractionCount(int userID) {
-        int count = 0;
-        if (!userIndex.containsKey(userID)) return count;
+    private int getUserInteractionCount(int userID) { // might wanna store this as a global and then perform lookups
+        int count;
+        if (!userIndex.containsKey(userID)) return 0;
 
+        /*
         for(int i = 0; i < interactions.size(); i++) {
             count += interactions.get(userIndex.get(userID))[i];
         }
+        */
+
+        count = iterateUserInteractions(userIndex.get(userID));
         return count;
     }
 
@@ -280,8 +290,48 @@ public class UDWInteractionGraph {
      * @return the User ID for the Nth most active user
      */
     public int NthMostActiveUser(int N) {
-        // TODO: Implement this method
-        return -1;
+        int mostActiveUser = 0;
+        mostActiveUser = orderUsers.get(userIndex.get(N-1));
+
+        return mostActiveUser;
+    }
+
+    private void mapUsers() { // this is kinda the same as getUserInteractionCount, but I haven't thought
+                                // through the implications of user IDs vs internal indexing
+        for (int i = 0; i < interactions.size(); i++) {
+            /*
+            int countInteractions = 0;
+            for (int j = 0; j < interactions.size(); j++) {
+                countInteractions += interactions.get(i)[j];
+            }
+            */
+            userInteractionCounts.put(i,iterateUserInteractions(i));
+        }
+    }
+
+    private int iterateUserInteractions(int user) {
+        int count = 0;
+        for(int i = 0; i < interactions.size(); i++) {
+            count += interactions.get(user)[i];
+        }
+        return count;
+    }
+
+    private void activeUsers() {
+        for (int i = 0; i < userInteractionCounts.size(); i++) {
+            int maxVal = 0;
+            int maxKey = -1;
+            for (Map.Entry<Integer, Integer> entry : userInteractionCounts.entrySet()) {
+                Integer key = entry.getKey();
+                Integer value = entry.getValue();
+
+                if (value > maxVal && !orderUsers.contains(key)) {
+                    maxVal = value;
+                    maxKey = key;
+                }
+            }
+            orderUsers.add(maxKey);
+        }
     }
 
     /* ------- Task 3 ------- */
