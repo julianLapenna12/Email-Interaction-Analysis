@@ -248,8 +248,10 @@ public class UDWInteractionGraph {
     }
 
     private int uniqueUserInteractions(int userID) {
-
         int count = 0;
+
+        if (!userIndex.containsKey(userID)) return count;
+
         for(int j = 0; j < interactions.size(); j++) { // and if they have an interaction with someone
             if(interactions.get(userIndex.get(userID))[j] != 0) {
 
@@ -263,6 +265,9 @@ public class UDWInteractionGraph {
 
     private int getUserInteractionCount(int userID) {
         int count = 0;
+
+        if (!userIndex.containsKey(userID)) return count;
+
         for(int i = 0; i < interactions.size(); i++) {
             count += interactions.get(userIndex.get(userID))[i];
         }
