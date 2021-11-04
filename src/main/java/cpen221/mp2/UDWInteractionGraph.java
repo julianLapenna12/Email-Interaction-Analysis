@@ -34,8 +34,6 @@ public class UDWInteractionGraph {
      *                 directory containing email interactions
      */
     public UDWInteractionGraph(String fileName) {
-        // TODO: Implement this constructor
-
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
@@ -67,6 +65,7 @@ public class UDWInteractionGraph {
         List<int[]> newEmailData = new ArrayList<int[]>();
         for (int i = 0; i < inputUDWIG.ArrayEmailData.size(); i++) {
             if (inputUDWIG.ArrayEmailData.get(i)[TIME] >= timeFilter[LOWER_TIME] && inputUDWIG.ArrayEmailData.get(i)[TIME] <= timeFilter[UPPER_TIME]) {
+                ArrayEmailData.add(inputUDWIG.ArrayEmailData.get(i));
                 newEmailData.add(inputUDWIG.ArrayEmailData.get(i));
                 sendIds.add(inputUDWIG.ArrayEmailData.get(i)[SENDER]);
                 destIds.add(inputUDWIG.ArrayEmailData.get(i)[RECEIVER]);
@@ -91,6 +90,7 @@ public class UDWInteractionGraph {
         List<int[]> newEmailData = new ArrayList<int[]>();
         for (int i = 0; i < inputUDWIG.ArrayEmailData.size(); i++) {
             if (userFilter.contains(inputUDWIG.ArrayEmailData.get(i)[SENDER]) || userFilter.contains(inputUDWIG.ArrayEmailData.get(i)[RECEIVER])) {
+                ArrayEmailData.add(inputUDWIG.ArrayEmailData.get(i));
                 newEmailData.add(inputUDWIG.ArrayEmailData.get(i));
                 sendIds.add(inputUDWIG.ArrayEmailData.get(i)[SENDER]);
                 destIds.add(inputUDWIG.ArrayEmailData.get(i)[RECEIVER]);
@@ -111,7 +111,7 @@ public class UDWInteractionGraph {
 
         for (int i = 0; i < inputDWIG.getEmailData().size(); i++) {
             newEmailData.add(inputDWIG.getEmailData().get(i));
-
+            ArrayEmailData = inputDWIG.getEmailData();
             sendIds.add(inputDWIG.getEmailData().get(i)[SENDER]);
             destIds.add(inputDWIG.getEmailData().get(i)[RECEIVER]);
 
@@ -227,8 +227,14 @@ public class UDWInteractionGraph {
      *  [NumberOfUsers, NumberOfEmailTransactions]
      */
     public int[] ReportActivityInTimeWindow(int[] timeWindow) {
-        // TODO: Implement this method
-        return null;
+        //create a new UDW object using the time window
+        UDWInteractionGraph timeConstrained = new UDWInteractionGraph(this, timeWindow);
+
+        int[] activityReport = new int[2];
+        activityReport[0] = timeConstrained.ids.size();
+        activityReport[1] = timeConstrained.ArrayEmailData.size();
+
+        return activityReport;
     }
 
     /**
@@ -249,23 +255,18 @@ public class UDWInteractionGraph {
 
     private int uniqueUserInteractions(int userID) {
         int count = 0;
-
         if (!userIndex.containsKey(userID)) return count;
 
         for(int j = 0; j < interactions.size(); j++) { // and if they have an interaction with someone
             if(interactions.get(userIndex.get(userID))[j] != 0) {
-
                 count++;
             }
         }
-
         return count;
-
     }
 
     private int getUserInteractionCount(int userID) {
         int count = 0;
-
         if (!userIndex.containsKey(userID)) return count;
 
         for(int i = 0; i < interactions.size(); i++) {

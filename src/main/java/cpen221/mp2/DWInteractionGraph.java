@@ -196,7 +196,7 @@ public class DWInteractionGraph {
      * @return a List of ints containing sender ID, receiver ID, and the time the email was sent.
      */
     List<int[]> getEmailData(){
-        return  new ArrayList<>(emailData);
+        return new ArrayList<>(emailData);
     }
 
     /* ------- Task 2 ------- */
