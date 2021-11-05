@@ -1,10 +1,11 @@
 package cpen221.mp2;
 
+import com.sun.source.tree.Tree;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class DWInteractionGraph {
 
@@ -12,7 +13,7 @@ public class DWInteractionGraph {
     private List<int []> emailData;        //Stores source id and destination id at corresponding indicies for each email
     private Set<Integer> ids;
 
-    private Map<Integer, Map<Integer, List<Integer>>> emailGraph;
+    private Map<Integer, TreeMap<Integer, List<Integer>>> emailGraph;
     private TreeSet<EmailUser> senderMetric = new TreeSet<>((u1, u2) -> {
         if(u1.getNumSends() == u2.getNumSends()){
             return u2.getId() - u1.getId();
@@ -141,12 +142,64 @@ public class DWInteractionGraph {
      *
      * @param emailData
      */
-    private Map<Integer, Map<Integer, List<Integer>>> categorizeEmails(List<int[]> emailData) {
-        Map<Integer, Map<Integer, List<Integer>>> graph = new HashMap<>();
+    private Map<Integer, TreeMap<Integer, List<Integer>>> categorizeEmails(List<int[]> emailData) {
+        Map<Integer, TreeMap<Integer, List<Integer>>> graph = new HashMap<>();
         for(int[] email : emailData){
             graph = addEmail(email, graph);
         }
         return graph;
+    }
+
+
+    /**
+     * Adds information from a single Email interaction to the interaction Graph
+     * @param email an int array representing a single email, where the first element is sender ID, second is receiver, and third is the time.
+     * @param graph a Map mapping each sender to a map of Receivers and time list of time stamps/
+     * @return the edited copy of the graph
+     */
+    private Map<Integer, TreeMap<Integer, List<Integer>>> addEmail(int[] email, Map<Integer, TreeMap<Integer, List<Integer>>> graph){
+        int sender = email[SENDER];
+        int receiver = email[RECEIVER];
+        int time = email[TIME];
+        if(graph.containsKey(sender)){
+            if(graph.get(sender).containsKey(receiver)){
+                graph.get(sender).get(receiver).add(time);
+            }
+            else {
+                ArrayList<Integer> timeList = new ArrayList<>();
+                timeList.add(time);
+                graph.get(sender).put(receiver,timeList);
+            }
+        }
+        else{
+            ArrayList<Integer> timeList = new ArrayList<>();
+            TreeMap<Integer, List<Integer>> receiverData = new TreeMap<Integer, List<Integer>>(Comparator.comparingInt(u -> -u));
+            timeList.add(time);
+            receiverData.put(receiver, timeList);
+            graph.put(sender, receiverData);
+        }
+        return graph;
+    }
+
+    /**
+     * Turns email string info into array info
+     *
+     * @param emails is a list of strings representing the raw data of the email information, where each line is a string
+     *              containing 3 integer values separated by spaces, representing sender ID, receiver ID, and the Time the email was sent.
+     * @return an arrayList of int triples, where each int array represents the sender ID, receiver ID, and time sent of each email.
+     * Effects: adds all the IDS of senders and receivers to sets of user IDs.
+     */
+    private ArrayList<int[]> getData(List<String> emails) {
+        ArrayList<int[]> data = new ArrayList<>();
+        int sendId, destId, timeId;
+        for(String email : emails) {
+            String[] srcDstTimeStr  = email.split(" ");
+            sendId = Integer.parseInt(srcDstTimeStr[SENDER]);
+            destId = Integer.parseInt(srcDstTimeStr[RECEIVER]);
+            timeId = Integer.parseInt(srcDstTimeStr[TIME]);
+            data.add(new int[]{sendId, destId, timeId});
+        }
+        return data;
     }
 
     private Set<Integer> createIDSet(List<int[]> emails){
@@ -178,57 +231,6 @@ public class DWInteractionGraph {
             }
             else senderMetric.add(new EmailUser(email[SENDER], SendOrReceive.SEND, email[RECEIVER]));
         }
-    }
-
-    /**
-     * Adds information from a single Email interaction to the interaction Graph
-     * @param email an int array representing a single email, where the first element is sender ID, second is receiver, and third is the time.
-     * @param graph a Map mapping each sender to a map of Receivers and time list of time stamps/
-     * @return the edited copy of the graph
-     */
-    private Map<Integer, Map<Integer, List<Integer>>> addEmail(int[] email, Map<Integer, Map<Integer, List<Integer>>> graph){
-        int sender = email[SENDER];
-        int receiver = email[RECEIVER];
-        int time = email[TIME];
-        if(graph.containsKey(sender)){
-            if(graph.get(sender).containsKey(receiver)){
-                graph.get(sender).get(receiver).add(time);
-            }
-            else {
-                ArrayList<Integer> timeList = new ArrayList<>();
-                timeList.add(time);
-                graph.get(sender).put(receiver,timeList);
-            }
-        }
-        else{
-            ArrayList<Integer> timeList = new ArrayList<>();
-            HashMap<Integer, List<Integer>> receiverData = new HashMap<>();
-            timeList.add(time);
-            receiverData.put(receiver, timeList);
-            graph.put(sender, receiverData);
-        }
-        return graph;
-    }
-
-    /**
-     * Turns email string info into array info
-     *
-     * @param emails is a list of strings representing the raw data of the email information, where each line is a string
-     *              containing 3 integer values separated by spaces, representing sender ID, receiver ID, and the Time the email was sent.
-     * @return an arrayList of int triples, where each int array represents the sender ID, receiver ID, and time sent of each email.
-     * Effects: adds all the IDS of senders and receivers to sets of user IDs.
-     */
-    private ArrayList<int[]> getData(List<String> emails) {
-        ArrayList<int[]> data = new ArrayList<>();
-        int sendId, destId, timeId;
-        for(String email : emails) {
-            String[] srcDstTimeStr  = email.split(" ");
-            sendId = Integer.parseInt(srcDstTimeStr[SENDER]);
-            destId = Integer.parseInt(srcDstTimeStr[RECEIVER]);
-            timeId = Integer.parseInt(srcDstTimeStr[TIME]);
-            data.add(new int[]{sendId, destId, timeId});
-        }
-        return data;
     }
 
     /**
@@ -318,7 +320,7 @@ public class DWInteractionGraph {
      * @return an integer number of emails received, if UserID did not receive any emails then returns 0;
      */
     private int getNumEmailReceived(int userID){
-        Map<Integer, Map<Integer, List<Integer>>> receiverGraph = createReceiverGraph(emailGraph, userID);
+        Map<Integer, TreeMap<Integer, List<Integer>>> receiverGraph = createReceiverGraph(emailGraph, userID);
         if(receiverGraph.isEmpty()){
             return 0;
         }
@@ -355,7 +357,7 @@ public class DWInteractionGraph {
      */
     private Set<Integer> getSenderSet(int userID){
         Set<Integer> senders = new HashSet<>();
-        Map<Integer, Map<Integer, List<Integer>>> receiverGraph = createReceiverGraph(emailGraph, userID);
+        Map<Integer, TreeMap<Integer, List<Integer>>> receiverGraph = createReceiverGraph(emailGraph, userID);
         if(receiverGraph.isEmpty()){
             return senders;
         }
@@ -371,11 +373,11 @@ public class DWInteractionGraph {
      * @param id is the id of the recipient from whose senders and emails the graph will be made
      * @return a directed graph representing all emails sent to a user.
      */
-    private Map<Integer, Map<Integer, List<Integer>>> createReceiverGraph(Map<Integer, Map<Integer, List<Integer>>> graph, int id){
-        Map<Integer, Map<Integer, List<Integer>>> receiverGraph = new HashMap<>();
+    private Map<Integer, TreeMap<Integer, List<Integer>>> createReceiverGraph(Map<Integer, TreeMap<Integer, List<Integer>>> graph, int id){
+        Map<Integer, TreeMap<Integer, List<Integer>>> receiverGraph = new HashMap<>();
         for(int sender : graph.keySet()){
             if(graph.get(sender).containsKey(id) ){
-                Map<Integer, List<Integer>> received = new HashMap<>();
+                TreeMap<Integer, List<Integer>> received = new TreeMap<>();
                 received.put(id, new ArrayList<>(graph.get(sender).get(id)));
                 receiverGraph.put(sender, received);
             }
@@ -420,8 +422,24 @@ public class DWInteractionGraph {
      * if no path exists, should return null.
      */
     public List<Integer> BFS(int userID1, int userID2) {
-        // TODO: Implement this method
-        return null;
+        ArrayList<Integer> queue = new ArrayList<>();
+        ArrayList<Integer> searched = new ArrayList<>();
+        int user;
+        queue.add(userID1);
+        for(int i = 0; i < queue.size(); i++){
+            user = queue.get(i);
+            if(user == userID2){
+                searched.add(user);
+                break;
+            }
+            else if(!searched.contains(user)) {
+                searched.add(user);
+                if(emailGraph.containsKey(user)) {
+                    queue.addAll(emailGraph.get(user).descendingKeySet());
+                }
+            }
+        }
+        return searched;
     }
 
     /**
@@ -434,9 +452,30 @@ public class DWInteractionGraph {
      * if no path exists, should return null.
      */
     public List<Integer> DFS(int userID1, int userID2) {
-        // TODO: Implement this method
-        return null;
+        ArrayList<Integer> nodesVisited = new ArrayList<>();
+        if(recursiveSearch(userID1, userID2, nodesVisited)) {
+            nodesVisited.add(userID2);
+            return nodesVisited;
+        }
+        return  null;
     }
+
+    private boolean recursiveSearch(int userID1, int userID2, List<Integer> nodesVisited){
+        TreeMap<Integer, List<Integer>> searchMap = emailGraph.get(userID1);
+        nodesVisited.add(userID1);
+        if(searchMap != null){
+            for(int user2 : searchMap.descendingKeySet()){
+                if(!nodesVisited.contains(user2)){
+                    if(user2 == userID2 || recursiveSearch(user2, userID2, nodesVisited)){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+
 
     /* ------- Task 4 ------- */
 
