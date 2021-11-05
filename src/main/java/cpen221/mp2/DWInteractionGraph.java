@@ -460,6 +460,13 @@ public class DWInteractionGraph {
         return  null;
     }
 
+    /**
+     * Recursive Function which searchs through the User Email graph using depth first search
+     * @param userID1 the user id from which the search is starting, is a valid user ID contained in the graph with non-null value
+     * @param userID2 the user id for which the search is finding the path to, must be a non-null integer which is contained in the graph.
+     * @param nodesVisited a list of valid user ids in the order which the function has visited the nodes, contains only valid integers corresponding to user IDs.
+     * @return a boolean determining whether or not the search has found user 2.
+     */
     private boolean recursiveSearch(int userID1, int userID2, List<Integer> nodesVisited){
         TreeMap<Integer, List<Integer>> searchMap = emailGraph.get(userID1);
         nodesVisited.add(userID1);
