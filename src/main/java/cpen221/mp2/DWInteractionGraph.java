@@ -493,8 +493,40 @@ public class DWInteractionGraph {
      * @return the maximum number of users that can be polluted in N hours
      */
     public int MaxBreachedUserCount(int hours) {
-        // TODO: Implement this method
-        return 0;
+        int max = 0;
+        for(int user : emailGraph.keySet()){
+            for(int receiver : emailGraph.get(user).keySet()){
+                for(int time : emailGraph.get(user).get(receiver)){
+                    Set<Integer> pollutedUsers = new HashSet<>();
+                    pollutedUsers.add(user);
+                    findPolluted(receiver, time, time + 60 * 60 * hours, pollutedUsers);
+                    if(pollutedUsers.size() > max){
+                        max = pollutedUsers.size();
+                    }
+
+                }
+            }
+        }
+        return max;
+    }
+
+    private Set<Integer> findPolluted(int infectedUser, int startTime, int endTime, Set<Integer> polluted){
+        TreeMap<Integer, List<Integer>> searchMap = emailGraph.get(infectedUser);
+        if(startTime < endTime && !polluted.contains(infectedUser)) {
+            polluted.add(infectedUser);
+            if (searchMap != null) {
+                for (int userSpread : searchMap.descendingKeySet()) {
+                    List<Integer> emailTimes = searchMap.get(userSpread);
+                    for (int email : emailTimes) {
+                        if(email >= startTime){
+                            polluted.addAll(findPolluted(userSpread, email, endTime, polluted));
+                        }
+                    }
+                }
+
+            }
+        }
+        return polluted;
     }
 
 }

@@ -71,6 +71,8 @@ The ```UDWInteractionGraph``` should implement the following public methods:
 Given that all users belong to the same institution and are being served by the same email server, they are exposed to a somewhat similar set of vulnerabilities. Thus, a hacker can exploit a potential vulnerability to quickly pollute a significant portion of the users.  
  
 Let us assume that the hacker can only send one email containing a malicious attachment. This is because sending more external emails might reveal a pattern making it easy for the firewall to detect it. Thus, the attacker is relying on the internal spread of the malware. This means when victim number 1 sends emails to their colleagues, they spread the malware, and so on. The firewall is triggered N hours after receipt of the first email to victim number 1.  
+
+Users may be infected and pollute downstream users at the exact same time that the hacker starts the attack. However, if the hacker attacks at time ```th```, and the firewall triggers ```n``` hours later, users receiving emails at time ```t >= th + n``` will not be polluted.
  
 In hindsight and having access to an email interaction record, one can calculate the maximum number of users that can be polluted in N hours. This is exactly what you should do in this task. You should implement the ```MaxBreachedUserCount``` method in the ```DWInteractionGraph``` class, which takes as input parameter ```hours (<int>)``` and returns the integer (```int```) count of maximum polluted users. Note that:  
 -  All interaction times in the input file are in seconds, but the input provided to this function is in hours.  
