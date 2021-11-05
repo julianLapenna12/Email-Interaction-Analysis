@@ -498,8 +498,7 @@ public class DWInteractionGraph {
             for(int receiver : emailGraph.get(user).keySet()){
                 for(int time : emailGraph.get(user).get(receiver)){
                     Set<Integer> pollutedUsers = new HashSet<>();
-                    pollutedUsers.add(user);
-                    findPolluted(receiver, time, time + 60 * 60 * hours, pollutedUsers);
+                    pollutedUsers = findPolluted(user, time, time + 60 * 60 * hours, pollutedUsers);
                     if(pollutedUsers.size() > max){
                         max = pollutedUsers.size();
                     }
@@ -512,7 +511,7 @@ public class DWInteractionGraph {
 
     private Set<Integer> findPolluted(int infectedUser, int startTime, int endTime, Set<Integer> polluted){
         TreeMap<Integer, List<Integer>> searchMap = emailGraph.get(infectedUser);
-        if(startTime < endTime && !polluted.contains(infectedUser)) {
+        if(startTime <= endTime && !polluted.contains(infectedUser)) {
             polluted.add(infectedUser);
             if (searchMap != null) {
                 for (int userSpread : searchMap.descendingKeySet()) {
