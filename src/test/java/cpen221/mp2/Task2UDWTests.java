@@ -87,6 +87,5 @@ public class Task2UDWTests {
                 Assertions.assertEquals(-1, blank.NthMostActiveUser(j + 4));
             }
         }
-
     }
 }

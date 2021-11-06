@@ -328,7 +328,8 @@ public class UDWInteractionGraph {
 
     /**
      * @param N a positive number representing rank. N=1 means the most active.
-     * @return the User ID for the Nth most active user
+     * @return the User ID for the Nth most active user, or -1 if either N < 1
+     *    or if N > number of users
      */
     public int NthMostActiveUser(int N) {
         // only valid for N <= number of users
