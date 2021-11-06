@@ -133,7 +133,9 @@ public class UDWInteractionGraph {
      * @return a Set of Integers, where every element in the set is a User ID
      * in this UDWInteractionGraph.
      */
-    public Set<Integer> getUserIDs() { return ids; }
+    public Set<Integer> getUserIDs() {
+        return ids;
+    }
 
     /**
      * @param user1 the User ID of the first user.
@@ -329,11 +331,11 @@ public class UDWInteractionGraph {
      * @return the User ID for the Nth most active user
      */
     public int NthMostActiveUser(int N) {
-        int mostActiveUser = 0;
-        // N-1 to account for array indexing
-        mostActiveUser = orderUsers.get(userIndex.get(N - 1));
-
-        return mostActiveUser;
+        // only valid for N <= number of users
+        if (ids.size() > N) {
+            return orderUsers.get(userIndex.get(N - 1));
+        }
+        return -1;
     }
 
     /**

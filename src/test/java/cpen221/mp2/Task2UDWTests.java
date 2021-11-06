@@ -10,12 +10,22 @@ import java.util.List;
 public class Task2UDWTests {
 
     private static UDWInteractionGraph testGraphBase;
-    private static UDWInteractionGraph testBlankGraph;
+    private static UDWInteractionGraph blank;
+    private static UDWInteractionGraph selfInteractions;
+    private static UDWInteractionGraph multipleSelfInteractions;
+    private static UDWInteractionGraph negativeIndexes;
+    private static UDWInteractionGraph negativeIndexes2;
+    private static UDWInteractionGraph homebrew1;
 
     @BeforeAll
     public static void setupTests() {
         testGraphBase = new UDWInteractionGraph("resources/Task1-2UDWTransactions.txt");
-        testBlankGraph = new UDWInteractionGraph("resources/UDW_Blank.txt");
+        blank = new UDWInteractionGraph("resources/Blank.txt");
+        selfInteractions = new UDWInteractionGraph("resources/Self_single.txt");
+        multipleSelfInteractions = new UDWInteractionGraph("resources/Self_multiple.txt");
+        negativeIndexes = new UDWInteractionGraph("resources/Self_single_with_negatives.txt");
+        negativeIndexes2 = new UDWInteractionGraph("resources/Self_multiple_with_negatives.txt");
+        homebrew1 = new UDWInteractionGraph("resources/Task1-Homebrew1.txt");
     }
 
     @Test
@@ -62,7 +72,21 @@ public class Task2UDWTests {
     }
 
     @Test
-    public void nullTest1() {
+    public void blankTest1() {
+        int[] result;
+        for (int i = -20; i < 20; i += 7) {
+            for (int j = -3; j < 4; j++) {
+                result = blank.ReportActivityInTimeWindow(new int[]{i, j});
+                Assertions.assertEquals(0, result[0]);
+                Assertions.assertEquals(0, result[1]);
+
+                result = blank.ReportOnUser(i + j);
+                Assertions.assertEquals(0, result[0]);
+                Assertions.assertEquals(0, result[1]);
+
+                Assertions.assertEquals(-1, blank.NthMostActiveUser(j + 4));
+            }
+        }
 
     }
 }
