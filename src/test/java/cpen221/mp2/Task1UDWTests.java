@@ -25,7 +25,7 @@ public class Task1UDWTests {
         testGraph2 = new UDWInteractionGraph(testGraphBase, new int[]{10, 11});
         blank = new UDWInteractionGraph("resources/Blank.txt");
         selfInteractions = new UDWInteractionGraph("resources/Self_single.txt");
-        multipleSelfInteractions = new UDWInteractionGraph("resources/Self_multiple_with_negatives.txt");
+        multipleSelfInteractions = new UDWInteractionGraph("resources/Self_multiple.txt");
         negativeIndexes = new UDWInteractionGraph("resources/Self_single_with_negatives.txt");
         negativeIndexes2 = new UDWInteractionGraph("resources/Self_multiple_with_negatives.txt");
     }
@@ -88,6 +88,49 @@ public class Task1UDWTests {
         Assertions.assertEquals(new HashSet<>(Arrays.asList()), blank.getUserIDs());
         Assertions.assertEquals(0, blank.getEmailCount(0, 1));
         Assertions.assertEquals(0, blank.getEmailCount(2, 3));
+    }
+
+    @Test
+    public void testConstructorBlankVariant2() {
+        DWInteractionGraph dwig = new DWInteractionGraph("resources/Blank.txt");
+        UDWInteractionGraph udwig = new UDWInteractionGraph(dwig);
+
+        Assertions.assertEquals(new HashSet<>(Arrays.asList()), udwig.getUserIDs());
+        Assertions.assertEquals(0, udwig.getEmailCount(0, 1));
+        Assertions.assertEquals(0, udwig.getEmailCount(2, 3));
+    }
+
+    @Test
+    public void testConstructorBlankVariant3() {
+        DWInteractionGraph dwig = new DWInteractionGraph("resources/Blank.txt");
+        UDWInteractionGraph udwig = new UDWInteractionGraph(dwig);
+
+        List<Integer> userFilter = Arrays.asList(0, 1);
+        UDWInteractionGraph t = new UDWInteractionGraph(udwig, userFilter);
+
+        Assertions.assertEquals(new HashSet<>(Arrays.asList()), udwig.getUserIDs());
+        Assertions.assertEquals(0, t.getEmailCount(5, 11));
+        Assertions.assertEquals(0, t.getEmailCount(42, 32));
+    }
+
+    @Test
+    public void testConstructorBlankVariant4() {
+        UDWInteractionGraph udwig = new UDWInteractionGraph(blank, new int[]{5, 9});
+
+        List<Integer> userFilter = Arrays.asList(4, 6);
+        UDWInteractionGraph t = new UDWInteractionGraph(udwig, userFilter);
+
+        Assertions.assertEquals(new HashSet<>(Arrays.asList()), udwig.getUserIDs());
+        Assertions.assertEquals(0, t.getEmailCount(5, 11));
+        Assertions.assertEquals(0, t.getEmailCount(42, 32));
+    }
+
+    @Test
+    public void testConstructorWithSelfInteractions() {
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(0)), selfInteractions.getUserIDs());
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 1)), negativeIndexes.getUserIDs());
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(-67, -11, -2, 0, 1, 3, 11)), negativeIndexes2.getUserIDs());
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 1, 4, 5, 12, 322, 560)), multipleSelfInteractions.getUserIDs());
     }
 
 }
