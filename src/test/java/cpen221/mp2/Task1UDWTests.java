@@ -12,12 +12,22 @@ public class Task1UDWTests {
     private static UDWInteractionGraph testGraphBase;
     private static UDWInteractionGraph testGraph1;
     private static UDWInteractionGraph testGraph2;
+    private static UDWInteractionGraph blank;
+    private static UDWInteractionGraph selfInteractions;
+    private static UDWInteractionGraph multipleSelfInteractions;
+    private static UDWInteractionGraph negativeIndexes;
+    private static UDWInteractionGraph negativeIndexes2;
 
     @BeforeAll
     public static void setupTests() {
         testGraphBase = new UDWInteractionGraph("resources/Task1-2UDWTransactions.txt");
         testGraph1 = new UDWInteractionGraph(testGraphBase, new int[]{0, 9});
         testGraph2 = new UDWInteractionGraph(testGraphBase, new int[]{10, 11});
+        blank = new UDWInteractionGraph("resources/Blank.txt");
+        selfInteractions = new UDWInteractionGraph("resources/Self_single.txt");
+        multipleSelfInteractions = new UDWInteractionGraph("resources/Self_multiple_with_negatives.txt");
+        negativeIndexes = new UDWInteractionGraph("resources/Self_single_with_negatives.txt");
+        negativeIndexes2 = new UDWInteractionGraph("resources/Self_multiple_with_negatives.txt");
     }
 
     @Test
@@ -75,10 +85,9 @@ public class Task1UDWTests {
 
     @Test
     public void testConstructorBlankVariant() {
-        //DWInteractionGraph;
-
-        //UDWInteractionGraph udwig = new UDWInteractionGraph(dwigNull);
-        //Assertions.assertEquals(new HashSet<>(), udwig.getUserIDs());
+        Assertions.assertEquals(new HashSet<>(Arrays.asList()), blank.getUserIDs());
+        Assertions.assertEquals(0, blank.getEmailCount(0, 1));
+        Assertions.assertEquals(0, blank.getEmailCount(2, 3));
     }
 
 }
