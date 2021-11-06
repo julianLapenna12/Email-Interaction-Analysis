@@ -23,7 +23,6 @@ public class Task2UDWTests {
         selfInteractions = new UDWInteractionGraph("resources/Self_single.txt");
         multipleSelfInteractions = new UDWInteractionGraph("resources/Self_multiple.txt");
         homebrew1 = new UDWInteractionGraph("resources/Task1-Homebrew1.txt");
-        //big = new UDWInteractionGraph("resources/email-Eu-core-temporal-Dept1.txt");
     }
 
     @Test
