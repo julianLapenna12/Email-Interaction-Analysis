@@ -73,4 +73,12 @@ public class Task1UDWTests {
         Assertions.assertEquals(2, udwig.getEmailCount(2, 3));
     }
 
+    @Test
+    public void testConstructorBlankVariant() {
+        //DWInteractionGraph;
+
+        //UDWInteractionGraph udwig = new UDWInteractionGraph(dwigNull);
+        //Assertions.assertEquals(new HashSet<>(), udwig.getUserIDs());
+    }
+
 }

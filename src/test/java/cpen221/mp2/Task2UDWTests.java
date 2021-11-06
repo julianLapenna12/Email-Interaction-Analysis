@@ -10,10 +10,12 @@ import java.util.List;
 public class Task2UDWTests {
 
     private static UDWInteractionGraph testGraphBase;
+    private static UDWInteractionGraph testBlankGraph;
 
     @BeforeAll
     public static void setupTests() {
         testGraphBase = new UDWInteractionGraph("resources/Task1-2UDWTransactions.txt");
+        testBlankGraph = new UDWInteractionGraph("resources/UDW_Blank.txt");
     }
 
     @Test
@@ -57,5 +59,10 @@ public class Task2UDWTests {
     public void testNthActiveUser1() {
         UDWInteractionGraph t = new UDWInteractionGraph(testGraphBase, new int[]{0, 2});
         Assertions.assertEquals(1, t.NthMostActiveUser(2));
+    }
+
+    @Test
+    public void nullTest1() {
+
     }
 }
