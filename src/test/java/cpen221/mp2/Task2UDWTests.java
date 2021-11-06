@@ -13,9 +13,8 @@ public class Task2UDWTests {
     private static UDWInteractionGraph blank;
     private static UDWInteractionGraph selfInteractions;
     private static UDWInteractionGraph multipleSelfInteractions;
-    private static UDWInteractionGraph negativeIndexes;
-    private static UDWInteractionGraph negativeIndexes2;
     private static UDWInteractionGraph homebrew1;
+    private static UDWInteractionGraph big;
 
     @BeforeAll
     public static void setupTests() {
@@ -23,9 +22,8 @@ public class Task2UDWTests {
         blank = new UDWInteractionGraph("resources/Blank.txt");
         selfInteractions = new UDWInteractionGraph("resources/Self_single.txt");
         multipleSelfInteractions = new UDWInteractionGraph("resources/Self_multiple.txt");
-        negativeIndexes = new UDWInteractionGraph("resources/Self_single_with_negatives.txt");
-        negativeIndexes2 = new UDWInteractionGraph("resources/Self_multiple_with_negatives.txt");
         homebrew1 = new UDWInteractionGraph("resources/Task1-Homebrew1.txt");
+        //big = new UDWInteractionGraph("resources/email-Eu-core-temporal-Dept1.txt");
     }
 
     @Test
@@ -86,6 +84,105 @@ public class Task2UDWTests {
 
                 Assertions.assertEquals(-1, blank.NthMostActiveUser(j + 4));
             }
+        }
+    }
+
+    @Test
+    public void testSelfInteractions() {
+        int[] result = selfInteractions.ReportOnUser(0);
+        Assertions.assertEquals(11, result[0]);
+        Assertions.assertEquals(1, result[1]);
+    }
+
+    @Test
+    public void testSelfInteractions2() {
+        int[] result = multipleSelfInteractions.ReportOnUser(0);
+        Assertions.assertEquals(4, result[0]);
+        Assertions.assertEquals(1, result[1]);
+
+        int[] result1 = multipleSelfInteractions.ReportOnUser(1);
+        Assertions.assertEquals(3, result1[0]);
+        Assertions.assertEquals(1, result1[1]);
+    }
+
+    @Test
+    public void testSelfInteractions3() {
+        int[] result = multipleSelfInteractions.ReportActivityInTimeWindow(new int[]{0, 20});
+        Assertions.assertEquals(6, result[0]);
+        Assertions.assertEquals(12, result[1]);
+
+        int[] result1 = multipleSelfInteractions.ReportActivityInTimeWindow(new int[]{-12, 1});
+        Assertions.assertEquals(3, result1[0]);
+        Assertions.assertEquals(4, result1[1]);
+    }
+
+    @Test
+    public void testHomebrew() {
+        int[] result = homebrew1.ReportActivityInTimeWindow(new int[]{-10, 10});
+        Assertions.assertEquals(7, result[0]);
+        Assertions.assertEquals(5, result[1]);
+
+        int[] result1 = homebrew1.ReportOnUser(1);
+        Assertions.assertEquals(1, result1[0]);
+        Assertions.assertEquals(1, result1[1]);
+
+        int[] result8 = homebrew1.ReportOnUser(8);
+        Assertions.assertEquals(0, result8[0]);
+        Assertions.assertEquals(0, result8[1]);
+
+        int[] result0 = homebrew1.ReportOnUser(0);
+        Assertions.assertEquals(4, result0[0]);
+        Assertions.assertEquals(4, result0[1]);
+
+        int[] result10 = homebrew1.ReportOnUser(10);
+        Assertions.assertEquals(4, result10[0]);
+        Assertions.assertEquals(3, result10[1]);
+    }
+
+    @Test
+    public void testActiveUsers() {
+        UDWInteractionGraph t = new UDWInteractionGraph(homebrew1, new int[]{0, 2});
+        Assertions.assertEquals(1, t.NthMostActiveUser(2));
+    }
+
+    @Test
+    public void testActiveUsers2() {
+        UDWInteractionGraph t = new UDWInteractionGraph(homebrew1, new int[]{-10, 12});
+        Assertions.assertEquals(-1, t.NthMostActiveUser(0));
+        Assertions.assertEquals(0, t.NthMostActiveUser(1));
+    }
+
+    @Test
+    public void testActiveUsers3() {
+        UDWInteractionGraph t = new UDWInteractionGraph(homebrew1, new int[]{-10, 12});
+        Assertions.assertEquals(3, t.NthMostActiveUser(2));
+        Assertions.assertEquals(10, t.NthMostActiveUser(3));
+    }
+
+    @Test
+    public void testActiveUsers4() {
+        UDWInteractionGraph t = new UDWInteractionGraph(homebrew1, new int[]{-10, 12});
+        Assertions.assertEquals(12, t.NthMostActiveUser(8));
+        Assertions.assertEquals(-1, t.NthMostActiveUser(12));
+    }
+
+    @Test
+    public void testActiveUsers5() {
+        UDWInteractionGraph t = new UDWInteractionGraph("resources/active-user-test.txt");
+        Assertions.assertEquals(8, t.NthMostActiveUser(1));
+        Assertions.assertEquals(12, t.NthMostActiveUser(2));
+        Assertions.assertEquals(0, t.NthMostActiveUser(3));
+        Assertions.assertEquals(2, t.NthMostActiveUser(4));
+        Assertions.assertEquals(10, t.NthMostActiveUser(5));
+        Assertions.assertEquals(4, t.NthMostActiveUser(6));
+        Assertions.assertEquals(6, t.NthMostActiveUser(7));
+
+        for (int i = 0; i > -3; i--) {
+            Assertions.assertEquals(-1, t.NthMostActiveUser(i));
+        }
+
+        for (int i = 8; i < 11; i++) {
+            Assertions.assertEquals(-1, t.NthMostActiveUser(i));
         }
     }
 }

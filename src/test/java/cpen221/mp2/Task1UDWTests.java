@@ -18,6 +18,7 @@ public class Task1UDWTests {
     private static UDWInteractionGraph negativeIndexes;
     private static UDWInteractionGraph negativeIndexes2;
     private static UDWInteractionGraph homebrew1;
+    private static UDWInteractionGraph big;
 
     @BeforeAll
     public static void setupTests() {
@@ -167,6 +168,21 @@ public class Task1UDWTests {
 
         Assertions.assertEquals(new HashSet<>(Arrays.asList(-11, 5, 6, 9, 10, 0, 1, 3, 99, 12)), udwig4.getUserIDs());
         Assertions.assertEquals(0, udwig4.getEmailCount(0, 10));
+    }
+
+    @Test
+    public void testBigFile() {
+        big = new UDWInteractionGraph("resources/email-Eu-core-temporal-Dept1.txt");
+
+        System.out.println("User IDs: " + big.getUserIDs());
+        System.out.println("Emails between 161 and 267: " + big.getEmailCount(161, 267));
+    }
+
+    @Test
+    public void testConstructorWithSpaces() {
+        UDWInteractionGraph spaces = new UDWInteractionGraph("resources/more_than_single_space.txt");
+
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 1, 2, 3, 4, 6)), spaces.getUserIDs());
     }
 
 }

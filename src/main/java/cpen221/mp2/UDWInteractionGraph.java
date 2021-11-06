@@ -7,7 +7,6 @@ import java.util.*;
 
 public class UDWInteractionGraph {
 
-    private List<String> stringEmails = new ArrayList<String>();                 //Stores all raw email data
     private List<int[]> arrayEmailData = new ArrayList<int[]>();           //Stores source id and destination id at corresponding indicies for each email
     private Map<Integer, Integer> userInteractionCounts = new HashMap<>();  //Stores users mapped to their interaction counts
     private ArrayList<Integer> orderUsers = new ArrayList<>();
@@ -36,6 +35,8 @@ public class UDWInteractionGraph {
      *                 directory containing email interactions
      */
     public UDWInteractionGraph(String fileName) {
+        //Stores all raw email data
+        List<String> stringEmails = new ArrayList<String>();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
@@ -67,7 +68,8 @@ public class UDWInteractionGraph {
     public UDWInteractionGraph(UDWInteractionGraph inputUDWIG, int[] timeFilter) {
         List<int[]> newEmailData = new ArrayList<int[]>();
         for (int i = 0; i < inputUDWIG.arrayEmailData.size(); i++) {
-            if (inputUDWIG.arrayEmailData.get(i)[TIME] >= timeFilter[LOWER_TIME] && inputUDWIG.arrayEmailData.get(i)[TIME] <= timeFilter[UPPER_TIME]) {
+            if (inputUDWIG.arrayEmailData.get(i)[TIME] >= timeFilter[LOWER_TIME]
+                    && inputUDWIG.arrayEmailData.get(i)[TIME] <= timeFilter[UPPER_TIME]) {
                 arrayEmailData.add(inputUDWIG.arrayEmailData.get(i));
                 newEmailData.add(inputUDWIG.arrayEmailData.get(i));
                 sendIds.add(inputUDWIG.arrayEmailData.get(i)[SENDER]);
@@ -94,7 +96,8 @@ public class UDWInteractionGraph {
     public UDWInteractionGraph(UDWInteractionGraph inputUDWIG, List<Integer> userFilter) {
         List<int[]> newEmailData = new ArrayList<int[]>();
         for (int i = 0; i < inputUDWIG.arrayEmailData.size(); i++) {
-            if (userFilter.contains(inputUDWIG.arrayEmailData.get(i)[SENDER]) || userFilter.contains(inputUDWIG.arrayEmailData.get(i)[RECEIVER])) {
+            if (userFilter.contains(inputUDWIG.arrayEmailData.get(i)[SENDER]) ||
+                    userFilter.contains(inputUDWIG.arrayEmailData.get(i)[RECEIVER])) {
                 arrayEmailData.add(inputUDWIG.arrayEmailData.get(i));
                 newEmailData.add(inputUDWIG.arrayEmailData.get(i));
                 sendIds.add(inputUDWIG.arrayEmailData.get(i)[SENDER]);
@@ -235,20 +238,20 @@ public class UDWInteractionGraph {
             int[] dataForUser = new int[ids.size()];
 
             // iterating through the other users to find who interacted with who
-            for (int j = 0; j < emailData.size(); j++) {
+            for (int[] emailDatum : emailData) {
 
                 // for user interactions with themselves
-                if (emailData.get(j)[SENDER] == emailData.get(j)[RECEIVER]
-                        && (int) ids.toArray()[i] == emailData.get(j)[SENDER]) {
-                    dataForUser[userIndex.get(emailData.get(j)[RECEIVER])]++;
+                if (emailDatum[SENDER] == emailDatum[RECEIVER]
+                        && (int) ids.toArray()[i] == emailDatum[SENDER]) {
+                    dataForUser[userIndex.get(emailDatum[RECEIVER])]++;
 
                 } else { // for interactions with other users
 
-                    if ((int) ids.toArray()[i] == emailData.get(j)[SENDER]) {
-                        dataForUser[userIndex.get(emailData.get(j)[RECEIVER])]++;
+                    if ((int) ids.toArray()[i] == emailDatum[SENDER]) {
+                        dataForUser[userIndex.get(emailDatum[RECEIVER])]++;
                     }
-                    if ((int) ids.toArray()[i] == emailData.get(j)[RECEIVER]) {
-                        dataForUser[userIndex.get(emailData.get(j)[SENDER])]++;
+                    if ((int) ids.toArray()[i] == emailDatum[RECEIVER]) {
+                        dataForUser[userIndex.get(emailDatum[SENDER])]++;
                     }
                 }
             }
@@ -329,14 +332,33 @@ public class UDWInteractionGraph {
     /**
      * @param N a positive number representing rank. N=1 means the most active.
      * @return the User ID for the Nth most active user, or -1 if either N < 1
-     *    or if N > number of users
+     *   or if N > number of users
      */
     public int NthMostActiveUser(int N) {
-        // only valid for N <= number of users
-        if (ids.size() > N) {
-            return orderUsers.get(userIndex.get(N - 1));
+        // only valid for 0 < N <= number of users
+        if (N < 1) return -1;
+
+        if (ids.size() >= N) {
+            return reverseLookup(orderUsers.get(N - 1), userIndex);
         }
         return -1;
+    }
+
+    /**
+     *
+     * @param value a value that is contained at least once in the values of
+     *              a Map
+     * @param map a non-null Map such that value appears in the Map's values
+     *            at least once
+     * @return the first key in the map that is mapped to the given value
+     *
+     */
+    private int reverseLookup(int value, Map<Integer,Integer> map) {
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            if (entry.getValue() == value) return entry.getKey();
+        }
+
+        return 0;
     }
 
     /**
@@ -422,9 +444,7 @@ public class UDWInteractionGraph {
      */
     private int countNodes(HashSet<Integer>[] arrayOfSets) {
         int nodes = 0;
-        for (HashSet<Integer> set : arrayOfSets) {
-            if (set.size() > 0) nodes++;
-        }
+        for (HashSet<Integer> set : arrayOfSets) if (set.size() > 0) nodes++;
         return nodes;
     }
 
@@ -448,8 +468,7 @@ public class UDWInteractionGraph {
 
         for (int i = 0; i < groupedSets.length; i++) { // sort through each set
             if (groupedSets[i].size() > 0) {
-                HashSet<Integer> temp = new HashSet<>();
-                temp.addAll(groupedSets[i]);
+                HashSet<Integer> temp = new HashSet<>(groupedSets[i]);
 
                 // check each person interacted with the set
                 for (Integer j : temp) {
@@ -458,7 +477,8 @@ public class UDWInteractionGraph {
                     for (int k = 0; k < groupedSets.length; k++) {
                         if (k != i) {
 
-                            // if person j interacted with someone else (they appear in another interaction set)
+                            // if person j interacted with someone else
+                            // (they appear in another interaction set)
                             if (groupedSets[k].contains(j)) {
 
                                 // add all the elements into the original set
