@@ -13,12 +13,16 @@ public class Task1DWTests {
     private static DWInteractionGraph dwig;
     private static DWInteractionGraph dwig1;
     private static DWInteractionGraph dwig2;
+    private static DWInteractionGraph dwig3;
+    private static DWInteractionGraph dwig4;
 
     @BeforeAll
     public static void setupTests() {
         dwig = new DWInteractionGraph("resources/Task1-2Transactions.txt");
         dwig1 = new DWInteractionGraph(dwig, new int[]{3, 9});
         dwig2 = new DWInteractionGraph(dwig, Arrays.asList(2, 3, 4));
+        dwig3 = new DWInteractionGraph("resources/more_than_single_space.txt");
+        dwig4 = new DWInteractionGraph("resources/Blank.txt");
     }
 
     @Test
@@ -58,4 +62,15 @@ public class Task1DWTests {
         Assertions.assertEquals(2, dwig2.getEmailCount(2, 3));
     }
 
+    @Test
+    public void testGetDataWithSpaces() {
+        Assertions.assertEquals(2, dwig3.getEmailCount(1, 3));
+
+    }
+
+    @Test
+    public void testBlankDocument() {
+        Assertions.assertEquals(0, dwig4.getEmailCount(0, 0));
+        Assertions.assertEquals(0, dwig4.getEmailCount(1, 2));
+    }
 }
