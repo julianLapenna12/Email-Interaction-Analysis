@@ -236,7 +236,8 @@ public class UDWInteractionGraph {
             for (int j = 0; j < emailData.size(); j++) {
 
                 // for user interactions with themselves
-                if (emailData.get(j)[SENDER] == emailData.get(j)[RECEIVER]) {
+                if (emailData.get(j)[SENDER] == emailData.get(j)[RECEIVER]
+                        && (int) ids.toArray()[i] == emailData.get(j)[SENDER]) {
                     dataForUser[userIndex.get(emailData.get(j)[RECEIVER])]++;
 
                 } else { // for interactions with other users
