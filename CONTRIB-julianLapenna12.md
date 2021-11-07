@@ -5,34 +5,22 @@
 #Contributions
 
 ##Tasks:
-* ####Task 2
-* ####Task 4 + testing
+* ###Tasks 1, 2, 3 UDWInteractionGraph + testing
 
 ##Classes:
-* `Document.java`
-* `DocumentSimilarity.java`
-* `Task4Tests.java`
+* `UDWInteractionGraph.java`
+* `Task1UDWTests.java`
+* `Task2UDWTests.java`
+* `Task3UDWTests.java`
 
-##Document.java Methods Implemented:
-* `Document(String docId, URL docURL)`
-* `formatLineEnd(String line)`
-* `splitWord(String content)`
-* `trimWord(String input)`
-* `totalWords()`
-* `classifyWord(String word)`
-* `uniqueWordsCount()`
-* `hapaxWordsCount()`
-* `uniqueWordRatio()`
-* `hapaxLegomanaRatio()`
-
-##DocumentSimilarity.java Methods Implemented:
-* ####All methods
-
-##Task4Tests.java Implementation:
-* ####Everything
+##UDWInteractionGraph.java Implementation:
+* Everything (with some methods from DW graph by George copied and reworked to fit UDW graph)
 
 ##/resources Implemented:
-* ####All test_doc.txt files
-* ####test_metrics.txt
-* ####MP1_TESTING_GLOBAL_MASTER.xlsx for Task 4 test computation
+* `active-user-test.txt`
+* `Blank.txt`
+* `Self_[multiple, multiple_with_negatives, single, single_with_negatives].txt`
 
+##Specs, AF and RI
+* `UDWInteractionGraph.java` specs
+* `UDWInteractionGraph.java` AF and RI (with help from George on brainstorming)
