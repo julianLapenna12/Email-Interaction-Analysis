@@ -7,37 +7,56 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * This class represents a graph holding all email interactions between users where each node is
+ * a user who sent or recieved an email and each edge has a direction pointing from the sender to
+ * the reciever of an email sent between the two users with the weight of the edge representing
+ * how many emails were sent between the two users.
+ *
+ * Abstraction Invariant:
+ * Each node must be distinct and have at least one common edge with any node (including itself)
+ */
 public class DWInteractionGraph {
     /*Stores all raw email data*/
     private List<String> emails = new ArrayList<String>();
-    /**/
-    private List<int[]> emailData;//Stores source and destination id at corresponding indecies
-                                  // for each email
+    /*Stores sender id, receiver id, and time sent at indices 0, 1, and 2 respectively for an
+      integer array representing an email*/
+    private List<int[]> emailData;
+    /*Stores all ids of users who have send or recieved an email*/
     private Set<Integer> ids;
-
-    private Map<Integer, TreeMap<Integer, List<Integer>>> emailGraph; //Stores number of emails
-                                                                      // sent between users
+    /*Stores number of emails sent from one ID to another ID*/
+    private Map<Integer, TreeMap<Integer, List<Integer>>> emailGraph;
+    /*?USURE?*/
     private TreeSet<EmailUser> senderMetric = new TreeSet<>((u1, u2) -> {
         if (u1.getNumSends() == u2.getNumSends()) {
             return u2.getId() - u1.getId();
         } else return u1.getNumSends() - u2.getNumSends();
     });
-
+    /*?UNSURE?*/
     private TreeSet<EmailUser> receiverMetric = new TreeSet<>((u1, u2) -> {
         if (u1.getNumReceives() == u2.getNumReceives()) {
             return u2.getId() - u1.getId();
         } else return u1.getNumReceives() - u2.getNumReceives();
     });
 
-    /**/
+    /*Where send ID is stored in any integer array representing an email*/
     private final int SENDER = 0;
+    /*Where reciever ID is stored in any integer array representing an email*/
     private final int RECEIVER = 1;
+    /*Where reference time is stored in any integer array representing an email*/
     private final int TIME = 2;
+    /*Where lower bound on time filter is stored within time filter array*/
     private final int LOWER_TIME = 0;
+    /*Where upper bound on time filter is stored within time filter array*/
     private final int UPPER_TIME = 1;
 
+    // Representation Invariant
+    // (emailData)
 
-    //NOTE- Format of data in text files is SourceID DestinationID TimestampFrom0
+
+    // Abstraction Function
+
+
 
     /* ------- Task 1 ------- */
     /* Building the Constructors */
