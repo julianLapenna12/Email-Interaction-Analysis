@@ -65,7 +65,7 @@ public class DWInteractionGraph {
 
 
     // Abstraction Function
-    // For any graph G
+    // For any graph G with node N
     //
 
 

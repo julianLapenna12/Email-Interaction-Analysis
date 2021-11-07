@@ -45,8 +45,7 @@ public class UDWInteractionGraph {
         } catch (IOException ioe) {
             System.out.println("Problem reading file!");
         }
-
-        stringDataToArray(stringEmails);
+        arrayEmailData = stringDataToArray(stringEmails);
         MapEmailData(arrayEmailData);
         initializeTask3Data();
         activeUsers(mapUsers());
@@ -156,57 +155,39 @@ public class UDWInteractionGraph {
      *               integer is the receiver's user ID and the third integer is the
      *               time signature of the email.
      */
-    private void stringDataToArray(ArrayList<String> emails) {
-        int sendId = 0;
-        int destId = 0;
-        int timeId = 0;
-        int counter = 0;
-        boolean cont = true;
+    private ArrayList<int[]> stringDataToArray(ArrayList<String> emails) {
+        ArrayList<int[]> data = new ArrayList<>();
+        int sendId, destId, timeId;
 
         for (String email : emails) {
-            int[] srcDstTime = new int[3];
+            String[] srcDstTimeStr = new String[3];
+            int counter = 0;
 
-            // getting the sender
-            while (cont) {
-                if (email.charAt(counter) == ' ') {
-                    sendId = Integer.parseInt(email.substring(0, counter));
-                    cont = false;
+            for (int j = 0; j < 3; j++) { //Iterates through three datapoints in email
+                while (email.charAt(0) == ' ') {
+                    email = email.substring(1);//Appends email so it doesn't start with a space
                 }
-                counter++;
+                while (srcDstTimeStr[j] == null) {
+                    if (email.length() <= counter || email.charAt(counter) == ' ') {
+                        srcDstTimeStr[j] = email.substring(0, counter);
+                        email = email.substring(counter);
+                    }
+                    counter++;
+                }
+                counter = 0;
             }
-            cont = true;
-            int start = counter;
 
-            // getting the receiver
-            while (cont) {
-                if (email.charAt(counter) == ' ') {
-                    destId = Integer.parseInt(email.substring(start, counter));
-                    cont = false;
-                }
-                counter++;
-            }
-            cont = true;
-            start = counter;
-
-            // getting the time signature
-            while (cont) {
-                if (counter == email.length()) {
-                    timeId = Integer.parseInt(email.substring(start, counter));
-                    cont = false;
-                }
-                counter++;
-            }
+            sendId = Integer.parseInt(srcDstTimeStr[SENDER]);
+            destId = Integer.parseInt(srcDstTimeStr[RECEIVER]);
+            timeId = Integer.parseInt(srcDstTimeStr[TIME]);
 
             ids.add(sendId);
             ids.add(destId);
 
-            srcDstTime[SENDER] = sendId;
-            srcDstTime[RECEIVER] = destId;
-            srcDstTime[TIME] = timeId;
-            arrayEmailData.add(srcDstTime);
-            counter = 0;
-            cont = true;
+
+            data.add(new int[]{sendId, destId, timeId});
         }
+        return data;
     }
 
     /**
