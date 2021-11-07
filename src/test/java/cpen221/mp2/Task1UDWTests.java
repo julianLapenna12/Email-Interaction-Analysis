@@ -132,8 +132,10 @@ public class Task1UDWTests {
     public void testConstructorWithSelfInteractions() {
         Assertions.assertEquals(new HashSet<>(Arrays.asList(0)), selfInteractions.getUserIDs());
         Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 1)), negativeIndexes.getUserIDs());
-        Assertions.assertEquals(new HashSet<>(Arrays.asList(-67, -11, -2, 0, 1, 3, 11)), negativeIndexes2.getUserIDs());
-        Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 1, 4, 5, 12, 322, 560)), multipleSelfInteractions.getUserIDs());
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(-67, -11, -2, 0, 1, 3, 11)),
+                negativeIndexes2.getUserIDs());
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 1, 4, 5, 12, 322, 560)),
+                multipleSelfInteractions.getUserIDs());
     }
 
     @Test
@@ -163,10 +165,12 @@ public class Task1UDWTests {
         Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 3, 99, 10, 6)), udwig2.getUserIDs());
         Assertions.assertEquals(1, udwig2.getEmailCount(10, 6));
 
-        Assertions.assertEquals(new HashSet<>(Arrays.asList(-11, 5, 6, 9, 10, 0, 1, 3, 99, 12)), udwig3.getUserIDs());
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(-11, 5, 6, 9, 10, 0, 1, 3, 99, 12)),
+                udwig3.getUserIDs());
         Assertions.assertEquals(2, udwig3.getEmailCount(6, 10));
 
-        Assertions.assertEquals(new HashSet<>(Arrays.asList(-11, 5, 6, 9, 10, 0, 1, 3, 99, 12)), udwig4.getUserIDs());
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(-11, 5, 6, 9, 10, 0, 1, 3, 99, 12)),
+                udwig4.getUserIDs());
         Assertions.assertEquals(0, udwig4.getEmailCount(0, 10));
     }
 
@@ -184,6 +188,28 @@ public class Task1UDWTests {
     public void testConstructorWithSpaces() {
         UDWInteractionGraph spaces = new UDWInteractionGraph("resources/more_than_single_space.txt");
         Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6)), spaces.getUserIDs());
+    }
+
+    @Test
+    public void testExtraConstructor() {
+        UDWInteractionGraph extra = new UDWInteractionGraph
+                ("resources/Task1-Homebrew1.txt", new int[]{5,16});
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 12, 3, 4, 5, 6, 10, -11)), extra.getUserIDs());
+        Assertions.assertEquals(0, extra.getEmailCount(99, 0));
+        Assertions.assertEquals(1, extra.getEmailCount(10, 5));
+        Assertions.assertEquals(0, extra.getEmailCount(3, 6));
+        Assertions.assertEquals(0, extra.getEmailCount(18, 11));
+    }
+
+    @Test
+    public void testExtraConstructor2() {
+        UDWInteractionGraph extra = new UDWInteractionGraph(
+                "resources/Blank.txt", new int[]{5,16});
+        Assertions.assertEquals(new HashSet<>(Arrays.asList()), extra.getUserIDs());
+        Assertions.assertEquals(0, extra.getEmailCount(99, 0));
+        Assertions.assertEquals(0, extra.getEmailCount(10, 5));
+        Assertions.assertEquals(0, extra.getEmailCount(3, 6));
+        Assertions.assertEquals(0, extra.getEmailCount(18, 11));
     }
 
 }

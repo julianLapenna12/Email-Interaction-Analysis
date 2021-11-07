@@ -33,19 +33,19 @@ public class UDWInteractionGraph {
      *    Two nodes with the same number of connections are ordered by node number
      *
      *    A node only connected to itself has exactly one connection. */
-    private final ArrayList<Integer> orderedNodes = new ArrayList<>();
+    private ArrayList<Integer> orderedNodes = new ArrayList<>();
 
     /** A grid (or matrix) that holds interaction data such that each element (i,j)
      *    represents the weight between nodes i and j. (By symmetry, the elements
      *    (i,j) and (j,i) have the same value) */
-    private final ArrayList<int[]> interactions = new ArrayList<int[]>();            //Stores number of interactions between users - number at each index is interactions between user (index of list) and user at index
+    private ArrayList<int[]> interactions = new ArrayList<int[]>();
 
     /** The ID of every node (each user who has sent or received an email). */
-    private final HashSet<Integer> ids = new HashSet<>();
+    private HashSet<Integer> ids = new HashSet<>();
 
     /** A mapping that stores the node number on the graph, to the ID of the
      *    user represented by that node. */
-    private final HashMap<Integer, Integer> userIndex = new HashMap<Integer, Integer>();
+    private HashMap<Integer, Integer> userIndex = new HashMap<Integer, Integer>();
 
     /** The components of the graph separated into array elements. Each non
      *    empty set is a unique graph component that appears only once. Empty
@@ -99,6 +99,33 @@ public class UDWInteractionGraph {
         MapEmailData(arrayEmailData);
         initializeTask3Data();
         activeUsers(mapUsers());
+    }
+
+    /**
+     * Creates a new UDWInteractionGraph using an email interaction file.
+     *          and considering a time window filter.
+     *
+     * @param fileName the name of the file in the resources
+     *                 directory containing email interactions
+     * @param timeWindow an integer array of length 2: [t0, t1]
+     *                   where t0 <= t1. The created UDWInteractionGraph
+     *                   should only include those emails in the input
+     *                   UDWInteractionGraph with send time t in the
+     *                   t0 <= t <= t1 range.
+     */
+    public UDWInteractionGraph(String fileName, int[] timeWindow) {
+
+        UDWInteractionGraph UDW = new UDWInteractionGraph(new UDWInteractionGraph(fileName), timeWindow);
+
+        this.arrayEmailData = new ArrayList<>(UDW.arrayEmailData);
+        this.orderedNodes = new ArrayList<>(UDW.orderedNodes);
+        this.interactions = new ArrayList<>(UDW.interactions);
+        this.ids = new HashSet<>(UDW.ids);
+        this.userIndex = new HashMap<>(UDW.userIndex);
+        this.arrayOfComponentSets = UDW.arrayOfComponentSets.clone();
+        this.components = UDW.components;
+
+
     }
 
     /**
