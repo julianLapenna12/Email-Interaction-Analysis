@@ -275,6 +275,11 @@ public class DWInteractionGraph {
         return data;
     }
 
+    /**
+     *
+     * @param emails
+     * @return
+     */
     private Set<Integer> createIDSet(List<int[]> emails) {
         HashSet<Integer> allIDs = new HashSet<>();
         for (int[] email : emails) {
@@ -494,6 +499,8 @@ public class DWInteractionGraph {
      * Returns -1 if N is greater than the number of users
      */
     public int NthMostActiveUser(int N, SendOrReceive interactionType) {
+        if (N < 1) return -1;
+
         TreeSet<EmailUser> ordering;
         EmailUser user;
         if (interactionType.equals(SendOrReceive.SEND)) {
