@@ -182,8 +182,8 @@ public class Task1UDWTests {
 
     @Test
     public void testConstructorWithSpaces() {
-        //UDWInteractionGraph spaces = new UDWInteractionGraph("resources/more_than_single_space.txt");
-        //Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 1, 2, 3, 4, 6)), spaces.getUserIDs());
+        UDWInteractionGraph spaces = new UDWInteractionGraph("resources/more_than_single_space.txt");
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6)), spaces.getUserIDs());
     }
 
 }

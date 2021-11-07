@@ -9,19 +9,69 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.List;
 
+/**
+ * This class represents a graph holding all email interactions between users where each node is
+ *   a user who sent or received an email and each edge means the starting node and ending node (could
+ *   be the same node) have interacted at least once. The weight of the edge represents the frequency
+ *   of connection between nodes (or in other words is how many times the respective nodes have
+ *   interacted).
+ *
+ * Abstraction Invariant:
+ *   Each distinct user that has received or sent an email is a unique node and must have at least one common
+ *   edge with another node in the graph (including itself)
+ */
 public class UDWInteractionGraph {
 
-    private ArrayList<int[]> arrayEmailData = new ArrayList<int[]>();           //Stores source id and destination id at corresponding indicies for each email
+    /** Graph data separated by connection where each element of arrayEmailData
+     *    holds an interaction of weight 1 between two nodes */
+    private ArrayList<int[]> arrayEmailData = new ArrayList<int[]>();
+
+    /** A list of nodes in order of number of distinct connections to other nodes.
+     *    The node connected to the most other nodes is at the front, and
+     *    nodes with the least amount of connections are at the end.
+     *
+     *    Two nodes with the same number of connections are ordered by node number
+     *
+     *    A node only connected to itself has exactly one connection. */
     private ArrayList<Integer> orderedNodes = new ArrayList<>();
+
+    /** A grid (or matrix) that holds interaction data such that each element (i,j)
+     *    represents the weight between nodes i and j. (By symmetry, the elements
+     *    (i,j) and (j,i) have the same value) */
     private ArrayList<int[]> interactions = new ArrayList<int[]>();            //Stores number of interactions between users - number at each index is interactions between user (index of list) and user at index
+
+    /** The ID of every node (each user who has sent or received an email). */
     private HashSet<Integer> ids = new HashSet<>();
+
+    /** A mapping that stores the node number on the graph, to the ID of the
+     *    user represented by that node. */
     private HashMap<Integer, Integer> userIndex = new HashMap<Integer, Integer>();
+
+    /** The components of the graph separated into array elements. Each non
+     *    empty set is a unique graph component that appears only once. Empty
+     *    sets do not matter. */
     private HashSet<Integer>[] arrayOfComponentSets;
-    private int nodes;
+
+    /** The number of components on the graph. */
+    private int components;
 
     private final int SENDER = 0;
     private final int RECEIVER = 1;
     private final int TIME = 2;
+
+    // Representation Invariant
+    //   For all elements of arrayEmailData, each integer array size is 3
+    //   All ids in emailData must also be contained in ids
+    //   For every component, (# of edges) >= (# of nodes - 1)
+    //   For every graph G, (# of edges) >= (# of components) - (# of nodes),
+    //     components = (# of nodes), ids.size() = (# of nodes)
+
+
+    // Abstraction Function
+    //   For any graph G with nodes m1, m2, m3, ... mN
+    //     Edge between mX and mY = G.getEmailCount(mX, mY)
+    //   Nodes in G = G.ids
+    //
 
     /* ------- Task 1 ------- */
     /* Building the Constructors */
@@ -141,7 +191,6 @@ public class UDWInteractionGraph {
      * @param user2 the User ID of the second user.
      * @return the number of email interactions (send/receive) between user1 and user2
      */
-
     public int getEmailCount(int user1, int user2) {
         if (userIndex.containsKey(user1) && userIndex.containsKey(user2))
             return interactions.get(userIndex.get(user1))[userIndex.get(user2)];
@@ -154,6 +203,9 @@ public class UDWInteractionGraph {
      *               where the first integer is the sender's user ID, the second
      *               integer is the receiver's user ID and the third integer is the
      *               time signature of the email.
+     * @return emails where the String values have been converted to integers
+     *         and each respective integer represents the same thing it did
+     *         as a String
      */
     private ArrayList<int[]> stringDataToArray(ArrayList<String> emails) {
         ArrayList<int[]> data = new ArrayList<>();
@@ -241,7 +293,7 @@ public class UDWInteractionGraph {
      * @param timeWindow is an int array of size 2 [t0, t1]
      *                   where t0<=t1
      * @return an int array of length 2, with the following structure:
-     * [NumberOfUsers, NumberOfEmailTransactions]
+     *   [NumberOfUsers, NumberOfEmailTransactions]
      */
     public int[] ReportActivityInTimeWindow(int[] timeWindow) {
         //create a new UDW object using the time window
@@ -258,9 +310,9 @@ public class UDWInteractionGraph {
      * @param userID the User ID of the user for which
      *               the report will be created
      * @return an int array of length 2 with the following structure:
-     * [NumberOfEmails, UniqueUsersInteractedWith]
-     * If the specified User ID does not exist in this instance of a graph,
-     * returns [0, 0].
+     *   [NumberOfEmails, UniqueUsersInteractedWith]
+     *   If the specified User ID does not exist in this instance of a graph,
+     *   returns [0, 0].
      */
     public int[] ReportOnUser(int userID) {
         int[] userInformation = new int[2];
@@ -273,7 +325,7 @@ public class UDWInteractionGraph {
     /**
      * @param userID the user ID of the user to lookup
      * @return the number of distinct users (which can include themselves) that
-     * a given user has interacted with
+     *   a given user has interacted with
      */
     private int uniqueUserInteractions(int userID) {
         int count = 0;
@@ -294,7 +346,7 @@ public class UDWInteractionGraph {
      *
      * @param userID the user ID of the user to lookup
      * @return the total number of interactions between userID and
-     * any other user
+     *   any other user
      */
     private int getUserInteractionCount(int userID) {
         int count;
@@ -337,9 +389,10 @@ public class UDWInteractionGraph {
     }
 
     /**
-     * Maps each user to their interaction count. Helper method
-     * that helps when computing the listing of users ranked
-     * by activity
+     *
+     * @return a map of each user and their interaction count. Helper method
+     *        that helps when computing the listing of users ranked
+     *        by activity
      */
     private HashMap<Integer, Integer> mapUsers() {
         HashMap<Integer, Integer> userInteractionCounts = new HashMap<>();
@@ -352,7 +405,7 @@ public class UDWInteractionGraph {
     /**
      * @param user the index of the specific user
      * @return the total number of interactions between the user and
-     * any other user
+     *   any other user
      */
     private int iterateUserInteractions(int user) {
         int count = 0;
@@ -364,10 +417,10 @@ public class UDWInteractionGraph {
 
     /**
      * Generates a listing of users ordered by the most active user
-     * appearing first and the least active user appearing last.
+     *   appearing first and the least active user appearing last.
      * <p>
      * When two users have the same activity, the user with
-     * the lower user ID comes first in the listing.
+     *   the lower user ID comes first in the listing.
      */
     private void activeUsers(HashMap<Integer, Integer> interactionCounts) {
         for (int i = 0; i < interactionCounts.size(); i++) {
@@ -392,28 +445,28 @@ public class UDWInteractionGraph {
 
     /**
      * @return the number of completely disjoint graph
-     * components in the UDWInteractionGraph object.
+     *   components in the UDWInteractionGraph object.
      */
     public int NumberOfComponents() {
-        return nodes;
+        return components;
     }
 
     /**
      * Helper method that initializes the component graph, nodes and paths
-     * for task 3. Included in a single method to make constructors
-     * more concise. Given the immutability, these should never be
-     * changed after initialization.
+     *   for task 3. Included in a single method to make constructors
+     *   more concise. Given the immutability, these should never be
+     *   changed after initialization.
      */
     private void initializeTask3Data() {
         arrayOfComponentSets = new HashSet[interactions.size()];
         arrayOfComponentSets = componentSets();
         arrayOfComponentSets = groupSets(arrayOfComponentSets);
-        nodes = countNodes(arrayOfComponentSets);
+        components = countNodes(arrayOfComponentSets);
     }
 
     /**
      * Finds the number of components on a graph. Assumes that the graph has already
-     * been grouped ( using groupSets() )
+     *   been grouped ( using groupSets() )
      *
      * @param arrayOfSets an array of non-null HashSets containing a sorted graph
      *                    where each HashSet contains a unique graph node or is empty
@@ -427,17 +480,17 @@ public class UDWInteractionGraph {
 
     /**
      * Converts an array of HashSets representing interactions into
-     * UDWInteractionGraph components
+     *   UDWInteractionGraph components
      *
      * @param arrayOfSets an array of non-null HashSets that represents the
      *                    interaction graph of all users where each array index is a node
      *                    and the HashSet contained holds the edges to the connecting
      *                    nodes
      * @return a collapsed array of HashSets where each non-empty HashSet is a
-     * unique graph component. Contains a minimum of 1 non-empty HashSet signifying
-     * a graph where every user is connected with a single component, and a max
-     * of n non-empty HashSets where every user interacted only with themselves.
-     * Empty HashSets are insignificant and ordering of HashSets is insignificant.
+     *   unique graph component. Contains a minimum of 1 non-empty HashSet signifying
+     *   a graph where every user is connected with a single component, and a max
+     *   of n non-empty HashSets where every user interacted only with themselves.
+     *   Empty HashSets are insignificant.
      */
     private HashSet<Integer>[] groupSets(HashSet<Integer>[] arrayOfSets) {
         HashSet<Integer>[] groupedSets;
@@ -473,12 +526,12 @@ public class UDWInteractionGraph {
 
     /**
      * Breaks up the interactions into an array of sets where each set contains
-     * the IDs of all the people who've interacted with associated person
+     *   the IDs of all the people who've interacted with associated person
      * <p>
      * The associated person is the index of the set's position in the array
      *
      * @return an array of sets where each index i of the array holds a set of
-     * people that person i has interacted with
+     *   people that person i has interacted with
      */
     private HashSet<Integer>[] componentSets() {
         HashSet<Integer>[] componentSets = new HashSet[interactions.size()];
