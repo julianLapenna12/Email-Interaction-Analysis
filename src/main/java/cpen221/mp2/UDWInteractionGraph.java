@@ -3,26 +3,25 @@ package cpen221.mp2;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.List;
 
 public class UDWInteractionGraph {
 
-    private List<int[]> arrayEmailData = new ArrayList<int[]>();           //Stores source id and destination id at corresponding indicies for each email
-    private Map<Integer, Integer> userInteractionCounts = new HashMap<>();  //Stores users mapped to their interaction counts
-    private ArrayList<Integer> orderUsers = new ArrayList<>();
-    private List<int[]> interactions = new ArrayList<int[]>();            //Stores number of interactions between users - number at each index is interactions between user (index of list) and user at index
-    private Set<Integer> sendIds = new HashSet<Integer>();                        //Stores all ids of people who sent emails
-    private Set<Integer> destIds = new HashSet<Integer>();                        //Stores all ids of people who received emails
-    private Set<Integer> ids = new HashSet<Integer>();
-    private Map<Integer, Integer> userIndex = new HashMap<Integer, Integer>();
+    private ArrayList<int[]> arrayEmailData = new ArrayList<int[]>();           //Stores source id and destination id at corresponding indicies for each email
+    private ArrayList<Integer> orderedNodes = new ArrayList<>();
+    private ArrayList<int[]> interactions = new ArrayList<int[]>();            //Stores number of interactions between users - number at each index is interactions between user (index of list) and user at index
+    private HashSet<Integer> ids = new HashSet<>();
+    private HashMap<Integer, Integer> userIndex = new HashMap<Integer, Integer>();
     private HashSet<Integer>[] arrayOfComponentSets;
     private int nodes;
 
     private final int SENDER = 0;
     private final int RECEIVER = 1;
     private final int TIME = 2;
-    private final int LOWER_TIME = 0;
-    private final int UPPER_TIME = 1;
 
     /* ------- Task 1 ------- */
     /* Building the Constructors */
@@ -36,7 +35,7 @@ public class UDWInteractionGraph {
      */
     public UDWInteractionGraph(String fileName) {
         //Stores all raw email data
-        List<String> stringEmails = new ArrayList<String>();
+        ArrayList<String> stringEmails = new ArrayList<String>();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
@@ -50,8 +49,7 @@ public class UDWInteractionGraph {
         stringDataToArray(stringEmails);
         MapEmailData(arrayEmailData);
         initializeTask3Data();
-        mapUsers();
-        activeUsers();
+        activeUsers(mapUsers());
     }
 
     /**
@@ -66,21 +64,22 @@ public class UDWInteractionGraph {
      *                   t0 <= t <= t1 range.
      */
     public UDWInteractionGraph(UDWInteractionGraph inputUDWIG, int[] timeFilter) {
-        List<int[]> newEmailData = new ArrayList<int[]>();
+        ArrayList<int[]> newEmailData = new ArrayList<int[]>();
         for (int i = 0; i < inputUDWIG.arrayEmailData.size(); i++) {
+            int LOWER_TIME = 0;
+            int UPPER_TIME = 1;
             if (inputUDWIG.arrayEmailData.get(i)[TIME] >= timeFilter[LOWER_TIME]
                     && inputUDWIG.arrayEmailData.get(i)[TIME] <= timeFilter[UPPER_TIME]) {
                 arrayEmailData.add(inputUDWIG.arrayEmailData.get(i));
                 newEmailData.add(inputUDWIG.arrayEmailData.get(i));
-                sendIds.add(inputUDWIG.arrayEmailData.get(i)[SENDER]);
-                destIds.add(inputUDWIG.arrayEmailData.get(i)[RECEIVER]);
+                ids.add(inputUDWIG.arrayEmailData.get(i)[SENDER]);
+                ids.add(inputUDWIG.arrayEmailData.get(i)[RECEIVER]);
             }
         }
 
         MapEmailData(newEmailData);
         initializeTask3Data();
-        mapUsers();
-        activeUsers();
+        activeUsers(mapUsers());
     }
 
     /**
@@ -94,21 +93,20 @@ public class UDWInteractionGraph {
      *                   nor the receiver exist in userFilter.
      */
     public UDWInteractionGraph(UDWInteractionGraph inputUDWIG, List<Integer> userFilter) {
-        List<int[]> newEmailData = new ArrayList<int[]>();
+        ArrayList<int[]> newEmailData = new ArrayList<int[]>();
         for (int i = 0; i < inputUDWIG.arrayEmailData.size(); i++) {
             if (userFilter.contains(inputUDWIG.arrayEmailData.get(i)[SENDER]) ||
                     userFilter.contains(inputUDWIG.arrayEmailData.get(i)[RECEIVER])) {
                 arrayEmailData.add(inputUDWIG.arrayEmailData.get(i));
                 newEmailData.add(inputUDWIG.arrayEmailData.get(i));
-                sendIds.add(inputUDWIG.arrayEmailData.get(i)[SENDER]);
-                destIds.add(inputUDWIG.arrayEmailData.get(i)[RECEIVER]);
+                ids.add(inputUDWIG.arrayEmailData.get(i)[SENDER]);
+                ids.add(inputUDWIG.arrayEmailData.get(i)[RECEIVER]);
             }
         }
 
         MapEmailData(newEmailData);
         initializeTask3Data();
-        mapUsers();
-        activeUsers();
+        activeUsers(mapUsers());
     }
 
     /**
@@ -117,19 +115,18 @@ public class UDWInteractionGraph {
      * @param inputDWIG a DWInteractionGraph object
      */
     public UDWInteractionGraph(DWInteractionGraph inputDWIG) {
-        List<int[]> newEmailData = new ArrayList<int[]>();
+        ArrayList<int[]> newEmailData = new ArrayList<int[]>();
 
         for (int i = 0; i < inputDWIG.getEmailData().size(); i++) {
             newEmailData.add(inputDWIG.getEmailData().get(i));
             arrayEmailData = inputDWIG.getEmailData();
-            sendIds.add(inputDWIG.getEmailData().get(i)[SENDER]);
-            destIds.add(inputDWIG.getEmailData().get(i)[RECEIVER]);
+            ids.add(inputDWIG.getEmailData().get(i)[SENDER]);
+            ids.add(inputDWIG.getEmailData().get(i)[RECEIVER]);
         }
 
         MapEmailData(newEmailData);
         initializeTask3Data();
-        mapUsers();
-        activeUsers();
+        activeUsers(mapUsers());
     }
 
     /**
@@ -159,7 +156,7 @@ public class UDWInteractionGraph {
      *               integer is the receiver's user ID and the third integer is the
      *               time signature of the email.
      */
-    private void stringDataToArray(List<String> emails) {
+    private void stringDataToArray(ArrayList<String> emails) {
         int sendId = 0;
         int destId = 0;
         int timeId = 0;
@@ -200,8 +197,8 @@ public class UDWInteractionGraph {
                 counter++;
             }
 
-            sendIds.add(sendId);
-            destIds.add(destId);
+            ids.add(sendId);
+            ids.add(destId);
 
             srcDstTime[SENDER] = sendId;
             srcDstTime[RECEIVER] = destId;
@@ -222,10 +219,7 @@ public class UDWInteractionGraph {
      *                  int[1] = receiver's user ID
      *                  int[2] = time signature of email
      */
-    private void MapEmailData(List<int[]> emailData) {
-
-        ids.addAll(sendIds);
-        ids.addAll(destIds);
+    private void MapEmailData(ArrayList<int[]> emailData) {
 
         for (int i = 0; i < ids.size(); i++) {
             // mapping the user IDs to their internal indexes
@@ -339,7 +333,7 @@ public class UDWInteractionGraph {
         if (N < 1) return -1;
 
         if (ids.size() >= N) {
-            return reverseLookup(orderUsers.get(N - 1), userIndex);
+            return reverseLookup(orderedNodes.get(N - 1), userIndex);
         }
         return -1;
     }
@@ -353,8 +347,8 @@ public class UDWInteractionGraph {
      * @return the first key in the map that is mapped to the given value
      *
      */
-    private int reverseLookup(int value, Map<Integer,Integer> map) {
-        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+    private int reverseLookup(int value, HashMap<Integer,Integer> map) {
+        for (HashMap.Entry<Integer, Integer> entry : map.entrySet()) {
             if (entry.getValue() == value) return entry.getKey();
         }
 
@@ -366,10 +360,12 @@ public class UDWInteractionGraph {
      * that helps when computing the listing of users ranked
      * by activity
      */
-    private void mapUsers() {
+    private HashMap<Integer, Integer> mapUsers() {
+        HashMap<Integer, Integer> userInteractionCounts = new HashMap<>();
         for (int i = 0; i < interactions.size(); i++) {
             userInteractionCounts.put(i, iterateUserInteractions(i));
         }
+        return userInteractionCounts;
     }
 
     /**
@@ -392,22 +388,22 @@ public class UDWInteractionGraph {
      * When two users have the same activity, the user with
      * the lower user ID comes first in the listing.
      */
-    private void activeUsers() {
-        for (int i = 0; i < userInteractionCounts.size(); i++) {
+    private void activeUsers(HashMap<Integer, Integer> interactionCounts) {
+        for (int i = 0; i < interactionCounts.size(); i++) {
             int maxVal = 0;
             int maxKey = -1;
-            for (Map.Entry<Integer, Integer> entry : userInteractionCounts.entrySet()) {
+            for (HashMap.Entry<Integer, Integer> entry : interactionCounts.entrySet()) {
                 Integer key = entry.getKey();
                 Integer value = entry.getValue();
 
                 // when two users have the same interaction count, the first will be added,
-                // then the second time around they will appear in orderUsers
-                if (value > maxVal && !orderUsers.contains(key)) {
+                // then the second time around they will appear in orderedNodes
+                if (value > maxVal && !orderedNodes.contains(key)) {
                     maxVal = value;
                     maxKey = key;
                 }
             }
-            orderUsers.add(maxKey);
+            orderedNodes.add(maxKey);
         }
     }
 

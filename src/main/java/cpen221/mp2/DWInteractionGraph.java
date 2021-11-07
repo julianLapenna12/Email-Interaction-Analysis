@@ -26,7 +26,7 @@ public class DWInteractionGraph {
     private Set<Integer> ids;
     /*Stores number of emails sent from one ID to another ID*/
     private Map<Integer, TreeMap<Integer, List<Integer>>> emailGraph;
-    /*?USURE?*/
+    /*?UNSURE?*/
     private TreeSet<EmailUser> senderMetric = new TreeSet<>((u1, u2) -> {
         if (u1.getNumSends() == u2.getNumSends()) {
             return u2.getId() - u1.getId();
@@ -297,7 +297,7 @@ public class DWInteractionGraph {
      *
      * @return a List of ints containing sender ID, receiver ID, and the time the email was sent.
      */
-    List<int[]> getEmailData() {
+    ArrayList<int[]> getEmailData() {
         return new ArrayList<>(emailData);
     }
 
