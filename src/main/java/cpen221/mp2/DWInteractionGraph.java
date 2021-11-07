@@ -25,48 +25,58 @@ import java.util.HashSet;
  * Each node must be distinct and have at least one common edge with any node (including itself)
  */
 public class DWInteractionGraph {
-    /*Stores all raw email data*/
+    /**Stores all raw email data*/
     private List<String> emails = new ArrayList<String>();
-    /*Stores sender id, receiver id, and time sent at indices 0, 1, and 2 respectively for an
+
+    /**Stores sender id, receiver id, and time sent at indices 0, 1, and 2 respectively for an
       integer array representing an email*/
     private List<int[]> emailData;
-    /*Stores all ids of users who have send or recieved an email*/
+
+    /**Stores all ids of users who have send or recieved an email*/
     private Set<Integer> ids;
-    /*Stores number of emails sent from one ID to another ID*/
+
+    /**Stores number of emails sent from one ID to another ID*/
     private Map<Integer, TreeMap<Integer, List<Integer>>> emailGraph;
-    /*?UNSURE?*/
+
+    /**?UNSURE?*/
     private TreeSet<EmailUser> senderMetric = new TreeSet<>((u1, u2) -> {
         if (u1.getNumSends() == u2.getNumSends()) {
             return u2.getId() - u1.getId();
         } else return u1.getNumSends() - u2.getNumSends();
     });
-    /*?UNSURE?*/
+
+    /**?UNSURE?*/
     private TreeSet<EmailUser> receiverMetric = new TreeSet<>((u1, u2) -> {
         if (u1.getNumReceives() == u2.getNumReceives()) {
             return u2.getId() - u1.getId();
         } else return u1.getNumReceives() - u2.getNumReceives();
     });
 
-    /*Where send ID is stored in any integer array representing an email*/
+    /**Where send ID is stored in any integer array representing an email*/
     private final int SENDER = 0;
-    /*Where receiver ID is stored in any integer array representing an email*/
+
+    /**Where receiver ID is stored in any integer array representing an email*/
     private final int RECEIVER = 1;
-    /*Where reference time is stored in any integer array representing an email*/
+
+    /**Where reference time is stored in any integer array representing an email*/
     private final int TIME = 2;
-    /*Where lower bound on time filter is stored within time filter array*/
+
+    /**Where lower bound on time filter is stored within time filter array*/
     private final int LOWER_TIME = 0;
-    /*Where upper bound on time filter is stored within time filter array*/
+
+    /**Where upper bound on time filter is stored within time filter array*/
     private final int UPPER_TIME = 1;
 
     // Representation Invariant
-    // For all list elements of emailData, each integer array size is 3
-    // For all list elements of emails, no element is null
+    // For all elements of emailData, each integer array size is 3
+    // For all elements of emails, no element is null
     // All ids in emailData must also be contained in ids
 
 
     // Abstraction Function
-    // For any graph G with node N
-    //
+    // For any graph G with nodes m1, m2, m3, ... mN
+    // Edge from mX -> mY = G.emailGraph.get(mX).get(mY).size()
+    // Nodes in G = G.ids
 
 
     /* ------- Task 1 ------- */
