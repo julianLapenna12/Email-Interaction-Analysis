@@ -5,12 +5,20 @@ import com.sun.source.tree.Tree;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.HashMap;
+import java.util.Comparator;
+import java.util.HashSet;
 
 /**
  * This class represents a graph holding all email interactions between users where each node is
- * a user who sent or recieved an email and each edge has a direction pointing from the sender to
- * the reciever of an email sent between the two users with the weight of the edge representing
+ * a user who sent or received an email and each edge has a direction pointing from the sender to
+ * the receiver of an email sent between the two users with the weight of the edge representing
  * how many emails were sent between the two users.
  *
  * Abstraction Invariant:
@@ -41,7 +49,7 @@ public class DWInteractionGraph {
 
     /*Where send ID is stored in any integer array representing an email*/
     private final int SENDER = 0;
-    /*Where reciever ID is stored in any integer array representing an email*/
+    /*Where receiver ID is stored in any integer array representing an email*/
     private final int RECEIVER = 1;
     /*Where reference time is stored in any integer array representing an email*/
     private final int TIME = 2;
@@ -51,11 +59,14 @@ public class DWInteractionGraph {
     private final int UPPER_TIME = 1;
 
     // Representation Invariant
-    // (emailData)
+    // For all list elements of emailData, each integer array size is 3
+    // For all list elements of emails, no element is null
+    // All ids in emailData must also be contained in ids
 
 
     // Abstraction Function
-
+    // For any graph G
+    //
 
 
     /* ------- Task 1 ------- */
