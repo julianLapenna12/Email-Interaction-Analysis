@@ -102,4 +102,9 @@ public class Task2DWTests {
         Assertions.assertTrue(notExpected != dwig4.ReportOnUser(11));
     }
 
+    @Test
+    public void testNthUserLargeDatabase(){
+        Assertions.assertTrue(dwig4.NthMostActiveUser(2, SendOrReceive.RECEIVE) > 0);
+    }
+
 }

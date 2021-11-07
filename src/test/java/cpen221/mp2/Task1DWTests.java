@@ -15,6 +15,7 @@ public class Task1DWTests {
     private static DWInteractionGraph dwig2;
     private static DWInteractionGraph dwig3;
     private static DWInteractionGraph dwig4;
+    private static DWInteractionGraph dwig5;
 
     @BeforeAll
     public static void setupTests() {
@@ -23,6 +24,7 @@ public class Task1DWTests {
         dwig2 = new DWInteractionGraph(dwig, Arrays.asList(2, 3, 4));
         dwig3 = new DWInteractionGraph("resources/more_than_single_space.txt");
         dwig4 = new DWInteractionGraph("resources/Blank.txt");
+        dwig5 = new DWInteractionGraph("resources/email-Eu-core-temporal.txt");
     }
 
     @Test
@@ -72,5 +74,10 @@ public class Task1DWTests {
     public void testBlankDocument() {
         Assertions.assertEquals(0, dwig4.getEmailCount(0, 0));
         Assertions.assertEquals(0, dwig4.getEmailCount(1, 2));
+    }
+
+    @Test
+    public void testLargeDocument(){
+        System.out.println(dwig4.getEmailCount(416, 356));
     }
 }

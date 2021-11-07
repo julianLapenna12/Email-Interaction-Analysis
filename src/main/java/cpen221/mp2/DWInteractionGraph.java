@@ -17,54 +17,83 @@ import java.util.HashSet;
 
 /**
  * This class represents a graph holding all email interactions between users where each node is
- *   a user who sent or received an email and each edge has a direction pointing from the sender to
- *   the receiver of an email sent between the two users with the weight of the edge representing
- *   how many emails were sent between the two users.
- *
+ * a user who sent or received an email and each edge has a direction pointing from the sender to
+ * the receiver of an email sent between the two users with the weight of the edge representing
+ * how many emails were sent between the two users.
+ * <p>
  * Abstraction Invariant:
  * Each node must be distinct and have at least one common edge with any node (including itself)
  */
 public class DWInteractionGraph {
-    /** Stores all raw email data */
-    private List<String> emails = new ArrayList<String>();
+    /**
+     * Stores all raw email data
+     */
+    private final List<String> emails = new ArrayList<String>();
 
-    /** Stores sender id, receiver id, and time sent at indices 0, 1, and 2 respectively for an
-      integer array representing an email */
-    private List<int[]> emailData;
+    /**
+     * Stores sender id, receiver id, and time sent at indices 0, 1, and 2 respectively for an
+     * integer array representing an email
+     */
+    private final List<int[]> emailData;
 
-    /** Stores all ids of users who have send or received an email */
-    private Set<Integer> ids;
+    /**
+     * Stores all ids of users who have send or received an email
+     */
+    private final Set<Integer> ids;
 
-    /** Stores number of emails sent from one ID to another ID */
-    private Map<Integer, TreeMap<Integer, List<Integer>>> emailGraph;
+    /**
+     * Stores number of emails sent from one ID to another ID
+     */
+    private final Map<Integer, TreeMap<Integer, List<Integer>>> emailGraph;
 
-    /** ?UNSURE? */
-    private TreeSet<EmailUser> senderMetric = new TreeSet<>((u1, u2) -> {
+    private final HashSet<Integer> senderSet = new HashSet<>();
+    private final HashSet<Integer> receiverSet = new HashSet<>();
+
+    /**
+     * Stores User Ids sorted in descending order by the number of emails sent by each user
+     */
+    private final TreeSet<EmailUser> senderMetric = new TreeSet<>((u1, u2) -> {
         if (u1.getNumSends() == u2.getNumSends()) {
             return u2.getId() - u1.getId();
-        } else return u1.getNumSends() - u2.getNumSends();
+        } else {
+            return u1.getNumSends() - u2.getNumSends();
+        }
     });
 
-    /** ?UNSURE? */
-    private TreeSet<EmailUser> receiverMetric = new TreeSet<>((u1, u2) -> {
+    /**
+     * Stores User Ids sorted in descending order by the number of emails received by each user
+     */
+    private final TreeSet<EmailUser> receiverMetric = new TreeSet<>((u1, u2) -> {
         if (u1.getNumReceives() == u2.getNumReceives()) {
             return u2.getId() - u1.getId();
-        } else return u1.getNumReceives() - u2.getNumReceives();
+        } else {
+            return u1.getNumReceives() - u2.getNumReceives();
+        }
     });
 
-    /** Where send ID is stored in any integer array representing an email */
+    /**
+     * Where send ID is stored in any integer array representing an email
+     */
     private final int SENDER = 0;
 
-    /** Where receiver ID is stored in any integer array representing an email */
+    /**
+     * Where receiver ID is stored in any integer array representing an email
+     */
     private final int RECEIVER = 1;
 
-    /** Where reference time is stored in any integer array representing an email */
+    /**
+     * Where reference time is stored in any integer array representing an email
+     */
     private final int TIME = 2;
 
-    /** Where lower bound on time filter is stored within time filter array */
+    /**
+     * Where lower bound on time filter is stored within time filter array
+     */
     private final int LOWER_TIME = 0;
 
-    /** Where upper bound on time filter is stored within time filter array */
+    /**
+     * Where upper bound on time filter is stored within time filter array
+     */
     private final int UPPER_TIME = 1;
 
     // Representation Invariant
@@ -93,7 +122,8 @@ public class DWInteractionGraph {
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
-            for (String fileLine = reader.readLine(); fileLine != null; fileLine = reader.readLine()) {
+            for (String fileLine = reader.readLine(); fileLine != null;
+                 fileLine = reader.readLine()) {
                 emails.add(fileLine);
             }
             reader.close();
@@ -188,8 +218,7 @@ public class DWInteractionGraph {
      *
      * @param emailData
      */
-    private Map<Integer, TreeMap<Integer,
-                List<Integer>>> categorizeEmails(List<int[]> emailData) {
+    private Map<Integer, TreeMap<Integer, List<Integer>>> categorizeEmails(List<int[]> emailData) {
         Map<Integer, TreeMap<Integer, List<Integer>>> graph = new HashMap<>();
         for (int[] email : emailData) {
             graph = addEmail(email, graph);
@@ -206,9 +235,8 @@ public class DWInteractionGraph {
      * @param graph a Map mapping each sender to a map of Receivers and time list of time stamps
      * @return the edited copy of the graph
      */
-    private Map<Integer, TreeMap<Integer,
-                List<Integer>>> addEmail(int[] email, Map<Integer,
-                                         TreeMap<Integer, List<Integer>>> graph) {
+    private Map<Integer, TreeMap<Integer, List<Integer>>> addEmail(int[] email, Map<Integer,
+        TreeMap<Integer, List<Integer>>> graph) {
         int sender = email[SENDER];
         int receiver = email[RECEIVER];
         int time = email[TIME];
@@ -225,7 +253,7 @@ public class DWInteractionGraph {
         } else {
             ArrayList<Integer> timeList = new ArrayList<>();
             TreeMap<Integer, List<Integer>> receiverData =
-                    new TreeMap<Integer, List<Integer>>(Comparator.comparingInt(u -> -u));
+                new TreeMap<Integer, List<Integer>>(Comparator.comparingInt(u -> -u));
 
             timeList.add(time);
             receiverData.put(receiver, timeList);
@@ -241,7 +269,7 @@ public class DWInteractionGraph {
      *               where each line is a string containing 3 integer values separated by spaces,
      *               representing sender ID, receiver ID, and the Time the email was sent.
      * @return an arrayList of int triples, where each int array represents the sender ID
-     *         receiver ID, and time sent of each email.
+     * receiver ID, and time sent of each email.
      * Effects: adds all the IDS of senders and receivers to sets of user IDs.
      */
     private ArrayList<int[]> getData(List<String> emails) {
@@ -270,15 +298,17 @@ public class DWInteractionGraph {
             destId = Integer.parseInt(srcDstTimeStr[RECEIVER]);
             timeId = Integer.parseInt(srcDstTimeStr[TIME]);
 
-            data.add(new int[]{sendId, destId, timeId});
+            data.add(new int[] {sendId, destId, timeId});
         }
         return data;
     }
 
     /**
+     * Creates a set of all ids of any users that sent or recieved an email.
      *
-     * @param emails
-     * @return
+     * @param emails a list of arrays of 3 integers representing emails, where the first integer is the Sender ID
+     *               the second Integer is the Receiver ID. and the third integer is the Time (in seconds) when the email was set.
+     * @return a set of user ID's representing every user that either sent or recieved on email from the given list.
      */
     private Set<Integer> createIDSet(List<int[]> emails) {
         HashSet<Integer> allIDs = new HashSet<>();
@@ -290,7 +320,7 @@ public class DWInteractionGraph {
     }
 
     /**
-     * Takes the list of all emails sents and uses it to create orderings of all users based on
+     * Takes the list of all emails sent and uses it to create orderings of all users based on
      * number of emails sent and received.
      *
      * @param emails a 3 valued integer list of all email data, containing sender and receiver
@@ -298,23 +328,29 @@ public class DWInteractionGraph {
      */
     private void createMetrics(List<int[]> emails) {
         for (int[] email : emails) {
-            if (receiverMetric.contains(new EmailUser(email[RECEIVER]))) {
+            if (receiverSet.contains(email[RECEIVER])) {
                 receiverMetric.stream().forEach(u -> {
                     if (u.getId() == email[RECEIVER]) {
                         u.receiveEmail(email[SENDER]);
                     }
                 });
-            } else receiverMetric.add(new EmailUser(email[RECEIVER], SendOrReceive.RECEIVE,
-                                      email[SENDER]));
+            } else {
+                receiverMetric.add(new EmailUser(email[RECEIVER], SendOrReceive.RECEIVE,
+                    email[SENDER]));
+                receiverSet.add(email[RECEIVER]);
+            }
 
-            if (senderMetric.contains(new EmailUser(email[SENDER]))) {
+            if (senderSet.contains(email[SENDER])) {
                 senderMetric.stream().forEach(u -> {
                     if (u.getId() == email[SENDER]) {
                         u.sendEmail(email[RECEIVER]);
                     }
                 });
-            } else senderMetric.add(new EmailUser(email[SENDER], SendOrReceive.SEND,
-                                                  email[RECEIVER]));
+            } else {
+                senderMetric.add(new EmailUser(email[SENDER], SendOrReceive.SEND,
+                    email[RECEIVER]));
+                senderSet.add(email[SENDER]);
+            }
         }
     }
 
@@ -349,7 +385,9 @@ public class DWInteractionGraph {
                 timeMetrics[2]++;
                 senderIds.add(email[SENDER]);
                 receiverIds.add(email[RECEIVER]);
-            } else if (email[2] > highBound) break;
+            } else if (email[2] > highBound) {
+                break;
+            }
         }
         timeMetrics[0] = senderIds.size();
         timeMetrics[1] = receiverIds.size();
@@ -368,10 +406,10 @@ public class DWInteractionGraph {
      */
     public int[] ReportOnUser(int userID) {
         Set<Integer> interactions = new HashSet<>();
-        int[] userMetric = new int[]{0, 0, 0};
+        int[] userMetric = new int[] {0, 0, 0};
 
         if (!ids.contains(userID)) {
-            return new int[]{0, 0, 0};
+            return new int[] {0, 0, 0};
         }
         interactions.addAll(getRecipientSet(userID));
         interactions.addAll(getSenderSet(userID));
@@ -407,11 +445,11 @@ public class DWInteractionGraph {
      *
      * @param userID The user id for which the report will be created.
      * @return an integer number of emails received, if UserID did not receive any emails then
-     *         returns 0
+     * returns 0
      */
     private int getNumEmailReceived(int userID) {
         Map<Integer, TreeMap<Integer, List<Integer>>> receiverGraph =
-                                            createReceiverGraph(emailGraph, userID);
+            createReceiverGraph(emailGraph, userID);
         if (receiverGraph.isEmpty()) {
             return 0;
         }
@@ -427,7 +465,7 @@ public class DWInteractionGraph {
      *
      * @param userID The user id for which the report will be created.
      * @return a set of user Id's corresponding to all the users who received emails from the
-     *         specified user,
+     * specified user,
      * returns an empty set if the user sent no emails.
      */
     private Set<Integer> getRecipientSet(int userID) {
@@ -447,13 +485,13 @@ public class DWInteractionGraph {
      *
      * @param userID The user id for which the report will be created.
      * @return a set of user Id's corresponding to all the users who sent emails to the
-     *         specified user,
+     * specified user,
      * returns an empty set if the user received no emails.
      */
     private Set<Integer> getSenderSet(int userID) {
         Set<Integer> senders = new HashSet<>();
         Map<Integer, TreeMap<Integer, List<Integer>>> receiverGraph =
-                                            createReceiverGraph(emailGraph, userID);
+            createReceiverGraph(emailGraph, userID);
         if (receiverGraph.isEmpty()) {
             return senders;
         }
@@ -473,10 +511,10 @@ public class DWInteractionGraph {
      *              made
      * @return a directed graph representing all emails sent to a user.
      */
-    private Map<Integer, TreeMap<Integer, List<Integer>>>createReceiverGraph(Map<Integer,
-                                                                            TreeMap<Integer,
-                                                                            List<Integer>>> graph,
-                                                                            int id) {
+    private Map<Integer, TreeMap<Integer, List<Integer>>> createReceiverGraph(Map<Integer,
+        TreeMap<Integer,
+            List<Integer>>> graph,
+                                                                              int id) {
         Map<Integer, TreeMap<Integer, List<Integer>>> receiverGraph = new HashMap<>();
         for (int sender : graph.keySet()) {
             if (graph.get(sender).containsKey(id)) {
@@ -489,7 +527,7 @@ public class DWInteractionGraph {
     }
 
     /**
-     * @param N               a positive number representing rank. N=1 means the most active.
+     * @param N               1a positive number representing rank. N=1 means the most active.
      *                        Requires n is a natural number
      * @param interactionType Represent the type of interaction to calculate the rank for
      *                        Can be SendOrReceive.Send or SendOrReceive.RECEIVE
@@ -499,13 +537,17 @@ public class DWInteractionGraph {
      * Returns -1 if N is greater than the number of users
      */
     public int NthMostActiveUser(int N, SendOrReceive interactionType) {
-        if (N < 1) return -1;
+        if (N < 1) {
+            return -1;
+        }
 
         TreeSet<EmailUser> ordering;
         EmailUser user;
         if (interactionType.equals(SendOrReceive.SEND)) {
             ordering = senderMetric;
-        } else ordering = receiverMetric;
+        } else {
+            ordering = receiverMetric;
+        }
         if (ordering.size() < N) {
             return -1;
         }
@@ -545,6 +587,9 @@ public class DWInteractionGraph {
                 }
             }
         }
+        if (!searched.contains(userID2)) {
+            return null;
+        }
         return searched;
     }
 
@@ -568,7 +613,7 @@ public class DWInteractionGraph {
     }
 
     /**
-     * Recursive Function which searchs through the User Email graph using depth first search
+     * Recursive Function which searches through the User Email graph using depth first search
      *
      * @param userID1      the user id from which the search is starting, is a valid user ID
      *                     contained in the graph with non-null value
@@ -580,6 +625,9 @@ public class DWInteractionGraph {
      */
     private boolean recursiveSearch(int userID1, int userID2, List<Integer> nodesVisited) {
         TreeMap<Integer, List<Integer>> searchMap = emailGraph.get(userID1);
+        if (userID1 == userID2) {
+            return true;
+        }
         nodesVisited.add(userID1);
         if (searchMap != null) {
             for (int user2 : searchMap.descendingKeySet()) {
@@ -598,11 +646,12 @@ public class DWInteractionGraph {
     /* ------- Task 4 ------- */
 
     /**
-     * Read the MP README file carefully to understand
-     * what is required from this method.
+     * performs a search on the DWInteractionGraph to find the maximum number of users a that can be infected by an email containing malware before being stopped by the firewall.
+     * Where the every user emailed by the infected user after the first Infected Email infects the subsequent recipients of the email until the firewall kicks in.
+     * The firewall kicks in after a certian number of hours, after which no new user can be infected.
      *
-     * @param hours
-     * @return the maximum number of users that can be polluted in N hours
+     * @param hours a natural number representing the number of hours after the first email until the firewall kicks in. I.E. the window of time in hours that a user can be infected.
+     * @return the maximum number of users that can be polluted in N hours, will be an integer greater than or equal to one.
      */
     public int MaxBreachedUserCount(int hours) {
         int max = 0;
@@ -611,7 +660,7 @@ public class DWInteractionGraph {
                 for (int time : emailGraph.get(user).get(receiver)) {
                     Set<Integer> pollutedUsers = new HashSet<>();
                     pollutedUsers = findPolluted(user, time, time + 60 * 60 * hours,
-                                                 pollutedUsers);
+                        pollutedUsers);
                     if (pollutedUsers.size() > max) {
                         max = pollutedUsers.size();
                     }
@@ -622,6 +671,15 @@ public class DWInteractionGraph {
         return max;
     }
 
+
+    /**
+     * @param infectedUser An integer representing the ID of the user who was sent an infected email, must be a valid userID,
+     *                     I.E. a user who was sent or received at least one email and a non-negative integer.
+     * @param startTime    a non-negative integer value representing the time when the infected email was sent.
+     * @param endTime      a non-negative integer value representing the time when the firewall kicks in, after which no more users  can be infected.
+     * @param polluted     A set of users IDs representing all of the users who have been infected so far. Must not be null.
+     * @return A non-null set of Integer user IDs representing all of the users who have been infected by the given infected user at a certain time.
+     */
     private Set<Integer> findPolluted(int infectedUser, int startTime, int endTime,
                                       Set<Integer> polluted) {
         TreeMap<Integer, List<Integer>> searchMap = emailGraph.get(infectedUser);

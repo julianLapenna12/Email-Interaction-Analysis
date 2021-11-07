@@ -12,12 +12,15 @@ public class Task4DWTests {
     private static DWInteractionGraph dwig1;
     private static DWInteractionGraph dwig2;
     private static DWInteractionGraph dwig3;
+    private static DWInteractionGraph dwig4;
+
 
     @BeforeAll
     public static void setupTests() {
         dwig1 = new DWInteractionGraph("resources/Task4Transactions1.txt");
         dwig2 = new DWInteractionGraph("resources/Task4Transactions2.txt");
         dwig3 = new DWInteractionGraph("resources/Task4Transactions3.txt");
+        dwig4 = new DWInteractionGraph("resources/email-Eu-core-temporal.txt");
     }
 
     @Test
@@ -38,5 +41,11 @@ public class Task4DWTests {
         // Attacking user 4 at t=3600 will lead to users 4, 5, 6, 3, and 1 (5 users) to be polluted
         // in a 6-hour-long window after the attack starts.
         Assertions.assertEquals(5, dwig3.MaxBreachedUserCount(6));
+    }
+
+    @Test
+    public void testLargeDatabase1(){
+        //Commented out as takes too long to compile.
+        //Assertions.assertTrue(dwig4.MaxBreachedUserCount(20) > 0);
     }
 }

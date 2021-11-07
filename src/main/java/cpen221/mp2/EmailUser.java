@@ -3,11 +3,15 @@ package cpen221.mp2;
 import java.util.HashSet;
 import java.util.Objects;
 
+/**
+ * A class for storing information about a single user in an Email network for getting metrics about them
+ * Stores value of how many emails they have sent and received and the number of emails you interacted with.
+ */
 class EmailUser {
-    private int id;
+    private final int id;
     private int sends = 0;
     private int receives = 0;
-    private HashSet<Integer> interactions = new HashSet<>();
+    private final HashSet<Integer> interactions = new HashSet<>();
 
     public EmailUser(int id){
         this.id = id;
@@ -54,9 +58,13 @@ class EmailUser {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        EmailUser emailUser = (EmailUser) o;
-        return id == emailUser.id;
+        if(o instanceof EmailUser) {
+            EmailUser emailUser = (EmailUser) o;
+            return id == emailUser.id;
+        }
+        else {
+            return false;
+        }
     }
 
     @Override

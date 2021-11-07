@@ -33,19 +33,19 @@ public class UDWInteractionGraph {
      *    Two nodes with the same number of connections are ordered by node number
      *
      *    A node only connected to itself has exactly one connection. */
-    private ArrayList<Integer> orderedNodes = new ArrayList<>();
+    private final ArrayList<Integer> orderedNodes = new ArrayList<>();
 
     /** A grid (or matrix) that holds interaction data such that each element (i,j)
      *    represents the weight between nodes i and j. (By symmetry, the elements
      *    (i,j) and (j,i) have the same value) */
-    private ArrayList<int[]> interactions = new ArrayList<int[]>();            //Stores number of interactions between users - number at each index is interactions between user (index of list) and user at index
+    private final ArrayList<int[]> interactions = new ArrayList<int[]>();            //Stores number of interactions between users - number at each index is interactions between user (index of list) and user at index
 
     /** The ID of every node (each user who has sent or received an email). */
-    private HashSet<Integer> ids = new HashSet<>();
+    private final HashSet<Integer> ids = new HashSet<>();
 
     /** A mapping that stores the node number on the graph, to the ID of the
      *    user represented by that node. */
-    private HashMap<Integer, Integer> userIndex = new HashMap<Integer, Integer>();
+    private final HashMap<Integer, Integer> userIndex = new HashMap<Integer, Integer>();
 
     /** The components of the graph separated into array elements. Each non
      *    empty set is a unique graph component that appears only once. Empty
