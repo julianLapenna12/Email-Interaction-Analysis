@@ -76,7 +76,7 @@ public class DWInteractionGraph {
     // Abstraction Function
     //   For any graph G with nodes m1, m2, m3, ... mN
     //     Edge from mX -> mY = G.emailGraph.get(mX).get(mY).size()
-    //   Nodes in G = G.ids
+    //     Nodes in G = G.ids
 
 
     /* ------- Task 1 ------- */

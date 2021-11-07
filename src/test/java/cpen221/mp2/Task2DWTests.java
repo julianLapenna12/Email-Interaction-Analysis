@@ -12,6 +12,8 @@ public class Task2DWTests {
     private static DWInteractionGraph dwig1;
     private static DWInteractionGraph dwig2;
     private static DWInteractionGraph dwig3;
+    private static DWInteractionGraph dwig4;
+    private static DWInteractionGraph dwig5;
 
     @BeforeAll
     public static void setupTests() {
@@ -19,6 +21,8 @@ public class Task2DWTests {
         dwig1 = new DWInteractionGraph(dwig, new int[]{3, 9});
         dwig2 = new DWInteractionGraph(dwig, Arrays.asList(2, 3, 4));
         dwig3 = new DWInteractionGraph("resources/Blank.txt");
+        dwig4 = new DWInteractionGraph("resources/email-Eu-core-temporal-Dept4.txt");
+
     }
 
     @Test
@@ -86,4 +90,16 @@ public class Task2DWTests {
         Assertions.assertEquals(-1, dwig3.NthMostActiveUser(1, SendOrReceive.SEND));
         Assertions.assertEquals(-1, dwig3.NthMostActiveUser(0, SendOrReceive.RECEIVE));
     }
+
+    @Test
+    public void testLargeDataset() {
+        Assertions.assertTrue(dwig4.NthMostActiveUser(1, SendOrReceive.SEND) != -1);
+    }
+
+    @Test
+    public void testDataForUserLargeDataset() {
+        int [] notExpected = {0, 0, 0};
+        Assertions.assertTrue(notExpected != dwig4.ReportOnUser(11));
+    }
+
 }

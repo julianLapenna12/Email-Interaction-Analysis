@@ -11,11 +11,13 @@ public class Task3DWTests {
 
     private static DWInteractionGraph dwig1;
     private static DWInteractionGraph dwig2;
+    private static DWInteractionGraph dwig3;
 
     @BeforeAll
     public static void setupTests() {
         dwig1 = new DWInteractionGraph("resources/Task3Transactions1.txt");
         dwig2 = new DWInteractionGraph("resources/Task3Transactions2.txt");
+        dwig3 = new DWInteractionGraph("resources/Task_3_Path_Test.txt");
     }
 
     @Test
@@ -40,5 +42,12 @@ public class Task3DWTests {
     public void testDFSGraph2() {
         List<Integer> expected = Arrays.asList(1, 3, 4, 8, 5, 7, 2, 9, 10);
         Assertions.assertEquals(expected, dwig2.DFS(1, 10));
+    }
+
+    @Test
+    public void testDFSGraph3() {
+        List<Integer> expected = Arrays.asList(6, 3, 9, 300, 12, 0);
+        Assertions.assertEquals(expected, dwig3.DFS(6, 0));
+        Assertions.assertEquals(expected, dwig3.BFS(6, 0));
     }
 }
