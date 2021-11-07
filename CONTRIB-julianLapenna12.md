@@ -5,7 +5,7 @@
 #Contributions
 
 ##Tasks:
-* ###Tasks 1, 2, 3 UDWInteractionGraph + testing
+* ###Tasks 1.2, 2, 3 UDWInteractionGraph + testing
 
 ##Classes:
 * `UDWInteractionGraph.java`
