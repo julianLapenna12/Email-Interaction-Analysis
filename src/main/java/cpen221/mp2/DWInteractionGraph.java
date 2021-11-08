@@ -107,7 +107,7 @@ public class DWInteractionGraph {
     //     Edge from mX -> mY = G.emailGraph.get(mX).get(mY).size()
     //     Nodes in G = G.ids
 
-    public void checkRep() {
+    private void checkRep() {
         Set<Integer> idsToCheck = new HashSet<Integer>();
         for (int i = 0; i < emailData.size(); i++) {
             if (emailData.get(i).length != 3) {
@@ -123,7 +123,7 @@ public class DWInteractionGraph {
                                            " be null");
             }
         }
-        if (ids != idsToCheck) {
+        if (!ids.equals(idsToCheck)) {
             throw new RuntimeException("Rep has been violated: All ids in emailData must also " +
                                        "be in ids");
         }
@@ -157,6 +157,7 @@ public class DWInteractionGraph {
         ids = createIDSet(emailData);
         emailGraph = categorizeEmails(emailData);
         createMetrics(emailData);
+        checkRep();
     }
 
     /**
@@ -179,6 +180,7 @@ public class DWInteractionGraph {
         this.ids = new HashSet<>(DW.ids);
         this.emailGraph = new HashMap<>(DW.emailGraph);
         createMetrics(emailData);
+        checkRep();
     }
 
     /**
@@ -208,6 +210,7 @@ public class DWInteractionGraph {
         ids = createIDSet(emailData);
         emailGraph = categorizeEmails(newEmailData);
         createMetrics(emailData);
+        checkRep();
     }
 
     /**
@@ -234,6 +237,7 @@ public class DWInteractionGraph {
         ids = createIDSet(emailData);
         emailGraph = categorizeEmails(otherEmailData);
         createMetrics(emailData);
+        checkRep();
     }
 
     /**

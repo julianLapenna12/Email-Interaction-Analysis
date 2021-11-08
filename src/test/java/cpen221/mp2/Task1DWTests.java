@@ -18,6 +18,7 @@ public class Task1DWTests {
     private static DWInteractionGraph dwig5;
     private static DWInteractionGraph dwig6;
     private static DWInteractionGraph dwig7;
+    private static DWInteractionGraph dwig8;
 
     @BeforeAll
     public static void setupTests() {
@@ -30,6 +31,12 @@ public class Task1DWTests {
         dwig6 = new DWInteractionGraph(dwig4, new int[]{3, 9});
         dwig7 = new DWInteractionGraph("resources/Blank.txt", new int[]{3, 9});
     }
+
+    @Test
+    public void testCheckRep() {
+        dwig8 = new DWInteractionGraph("resources/Task1-2Transactions.txt");
+    }
+
 
     @Test
     public void test1GetUserIDsBase() {
