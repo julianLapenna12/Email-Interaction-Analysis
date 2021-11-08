@@ -138,6 +138,28 @@ public class DWInteractionGraph {
     }
 
     /**
+     * Creates a new DWInteractionGraph using an email interaction file.
+     *          and considering a time window filter.
+     *
+     * @param fileName the name of the file in the resources
+     *                 directory containing email interactions
+     * @param timeWindow an integer array of length 2: [t0, t1]
+     *                   where t0 <= t1. The created UDWInteractionGraph
+     *                   should only include those emails in the input
+     *                   UDWInteractionGraph with send time t in the
+     *                   t0 <= t <= t1 range.
+     */
+    public DWInteractionGraph(String fileName, int[] timeWindow) {
+
+        DWInteractionGraph DW = new DWInteractionGraph(new DWInteractionGraph(fileName), timeWindow);
+
+        this.emailData = new ArrayList<>(DW.emailData);
+        this.ids = new HashSet<>(DW.ids);
+        this.emailGraph = new HashMap<>(DW.emailGraph);
+        createMetrics(emailData);
+    }
+
+    /**
      * Creates a new DWInteractionGraph from a DWInteractionGraph object
      * and considering a time window filter.
      *
