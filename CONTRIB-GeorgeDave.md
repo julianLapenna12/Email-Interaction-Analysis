@@ -30,6 +30,7 @@
 * `ArrayList<int[]> getData(List<String> emails)`
 * `Set<Integer> createIDSet(List<int[]> emails) - Updated by Joel`
 * `int MaxBreachedUserCount(int hours) - Created separate method that did not work, method shown is Joel's method`
+* `checkRep()`
 
 ##UDWImplementationGraph.java Methods Implemented:
 * `ArrayList<int[]> stringDataToArray(ArrayList<String> emails)`
