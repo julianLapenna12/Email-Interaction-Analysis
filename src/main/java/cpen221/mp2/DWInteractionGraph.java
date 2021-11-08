@@ -712,7 +712,6 @@ public class DWInteractionGraph {
                     if (pollutedUsers.size() > max) {
                         max = pollutedUsers.size();
                     }
-
                 }
             }
         }
@@ -725,19 +724,19 @@ public class DWInteractionGraph {
      *                     I.E. a user who was sent or received at least one email and a non-negative integer.
      * @param startTime    a non-negative integer value representing the time when the infected email was sent.
      * @param endTime      a non-negative integer value representing the time when the firewall kicks in, after which no more users  can be infected.
-     * @param polluted     A set of users IDs representing all of the users who have been infected so far. Must not be null.
-     * @return A non-null set of Integer user IDs representing all of the users who have been infected by the given infected user at a certain time.
+     * @param polluted     A set of users IDs representing all the users who have been infected so far. Must not be null.
+     * @return A non-null set of Integer user IDs representing all the users who have been infected by the given infected user at a certain time.
      */
     private Set<Integer> findPolluted(int infectedUser, int startTime, int endTime,
                                       Set<Integer> polluted) {
         TreeMap<Integer, List<Integer>> searchMap = emailGraph.get(infectedUser);
-        if (startTime <= endTime && !polluted.contains(infectedUser)) {
+        if (!polluted.contains(infectedUser)) {
             polluted.add(infectedUser);
             if (searchMap != null) {
                 for (int userSpread : searchMap.descendingKeySet()) {
                     List<Integer> emailTimes = searchMap.get(userSpread);
                     for (int email : emailTimes) {
-                        if (email >= startTime) {
+                        if (email >= startTime && email < endTime) {
                             polluted.addAll(findPolluted(userSpread, email, endTime, polluted));
                         }
                     }

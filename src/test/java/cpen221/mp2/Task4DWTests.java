@@ -13,6 +13,7 @@ public class Task4DWTests {
     private static DWInteractionGraph dwig2;
     private static DWInteractionGraph dwig3;
     private static DWInteractionGraph dwig4;
+    private static DWInteractionGraph dwig5;
 
 
     @BeforeAll
@@ -20,7 +21,8 @@ public class Task4DWTests {
         dwig1 = new DWInteractionGraph("resources/Task4Transactions1.txt");
         dwig2 = new DWInteractionGraph("resources/Task4Transactions2.txt");
         dwig3 = new DWInteractionGraph("resources/Task4Transactions3.txt");
-        dwig4 = new DWInteractionGraph("resources/email-Eu-core-temporal-Dept1.txt");
+        dwig4 = new DWInteractionGraph("resources/email-Eu-core-temporal.txt");
+        dwig5 = new DWInteractionGraph("resources/email-Eu-core-temporal-Dept1.txt");
     }
 
     @Test
@@ -45,7 +47,13 @@ public class Task4DWTests {
 
     @Test
     public void testLargeDatabase1(){
-        //Commented out as takes too long to compile.
-        System.out.println(dwig4.MaxBreachedUserCount(10));
+        //0 hour firewall is a special case where only the first user is infected
+        Assertions.assertEquals(1, dwig4.MaxBreachedUserCount(0));
+    }
+
+    @Test
+    public void testLargeDatabase2(){
+        //From Talking with other teams this might be the right answer
+        Assertions.assertEquals(41, dwig5.MaxBreachedUserCount(20));
     }
 }
