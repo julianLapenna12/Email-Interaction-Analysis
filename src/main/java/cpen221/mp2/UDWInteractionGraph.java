@@ -62,9 +62,25 @@ public class UDWInteractionGraph {
     // Representation Invariant
     //   For all elements of arrayEmailData, each integer array size is 3
     //   All ids in emailData must also be contained in ids
-    //   For every component, (# of edges) >= (# of nodes - 1)
     //   For every graph G, (# of edges) >= (# of components) - (# of nodes),
-    //     components = (# of nodes), ids.size() = (# of nodes)
+    //     components = (# of components), ids.size() = (# of nodes)
+
+    private void checkRep() {
+
+        for (int i = 0; i < arrayEmailData.size(); i++) {
+            if (arrayEmailData.get(i).length != 3) throw new RuntimeException("invalid data storage");
+        }
+
+        int edges = 0;
+        for (int i = 0; i < interactions.size(); i++) {
+            for (int j = i; j < interactions.size(); j++) {
+                if (interactions.get(i)[j] != 0) edges++;
+            }
+        }
+
+        if (edges < components - ids.size()) throw new RuntimeException("All present users should " +
+                "have at least one interaction");
+    }
 
 
     // Abstraction Function
@@ -99,6 +115,7 @@ public class UDWInteractionGraph {
         MapEmailData(arrayEmailData);
         initializeTask3Data();
         activeUsers(mapUsers());
+        checkRep();
     }
 
     /**
@@ -114,18 +131,8 @@ public class UDWInteractionGraph {
      *                   t0 <= t <= t1 range.
      */
     public UDWInteractionGraph(String fileName, int[] timeWindow) {
-
-        UDWInteractionGraph UDW = new UDWInteractionGraph(new UDWInteractionGraph(fileName), timeWindow);
-
-        this.arrayEmailData = new ArrayList<>(UDW.arrayEmailData);
-        this.orderedNodes = new ArrayList<>(UDW.orderedNodes);
-        this.interactions = new ArrayList<>(UDW.interactions);
-        this.ids = new HashSet<>(UDW.ids);
-        this.userIndex = new HashMap<>(UDW.userIndex);
-        this.arrayOfComponentSets = UDW.arrayOfComponentSets.clone();
-        this.components = UDW.components;
-
-
+        this(new UDWInteractionGraph(fileName), timeWindow);
+        checkRep();
     }
 
     /**
@@ -156,6 +163,7 @@ public class UDWInteractionGraph {
         MapEmailData(newEmailData);
         initializeTask3Data();
         activeUsers(mapUsers());
+        checkRep();
     }
 
     /**
@@ -183,6 +191,7 @@ public class UDWInteractionGraph {
         MapEmailData(newEmailData);
         initializeTask3Data();
         activeUsers(mapUsers());
+        checkRep();
     }
 
     /**
@@ -203,6 +212,7 @@ public class UDWInteractionGraph {
         MapEmailData(newEmailData);
         initializeTask3Data();
         activeUsers(mapUsers());
+        checkRep();
     }
 
     /**

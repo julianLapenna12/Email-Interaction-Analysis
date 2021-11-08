@@ -212,4 +212,10 @@ public class Task1UDWTests {
         Assertions.assertEquals(0, extra.getEmailCount(18, 11));
     }
 
+    @Test
+    public void testExtraConstructor3() {
+        UDWInteractionGraph t = new UDWInteractionGraph("resources/Self_single.txt", new int[]{0,0});
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(0)), t.getUserIDs());
+        Assertions.assertEquals(2, t.getEmailCount(0, 0));
+    }
 }
