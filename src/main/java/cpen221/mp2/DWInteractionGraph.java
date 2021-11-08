@@ -107,6 +107,28 @@ public class DWInteractionGraph {
     //     Edge from mX -> mY = G.emailGraph.get(mX).get(mY).size()
     //     Nodes in G = G.ids
 
+    public void checkRep() {
+        Set<Integer> idsToCheck = new HashSet<Integer>();
+        for (int i = 0; i < emailData.size(); i++) {
+            if (emailData.get(i).length != 3) {
+                throw new RuntimeException("Rep has been violated: All array elements of " +
+                                           "emailData must be of length 2");
+            }
+            idsToCheck.add(emailData.get(i)[SENDER]);
+            idsToCheck.add(emailData.get(i)[RECEIVER]);
+        }
+        for (int i = 0; i < emails.size(); i++) {
+            if (emails == null) {
+                throw new RuntimeException("Rep has been violated: No element of emails can" +
+                                           " be null");
+            }
+        }
+        if (ids != idsToCheck) {
+            throw new RuntimeException("Rep has been violated: All ids in emailData must also " +
+                                       "be in ids");
+        }
+    }
+
 
     /* ------- Task 1 ------- */
     /* Building the Constructors */

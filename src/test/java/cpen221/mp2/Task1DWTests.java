@@ -16,6 +16,8 @@ public class Task1DWTests {
     private static DWInteractionGraph dwig3;
     private static DWInteractionGraph dwig4;
     private static DWInteractionGraph dwig5;
+    private static DWInteractionGraph dwig6;
+    private static DWInteractionGraph dwig7;
 
     @BeforeAll
     public static void setupTests() {
@@ -25,6 +27,8 @@ public class Task1DWTests {
         dwig3 = new DWInteractionGraph("resources/more_than_single_space.txt");
         dwig4 = new DWInteractionGraph("resources/Blank.txt");
         dwig5 = new DWInteractionGraph("resources/email-Eu-core-temporal.txt");
+        dwig6 = new DWInteractionGraph(dwig4, new int[]{3, 9});
+        dwig7 = new DWInteractionGraph("resources/Blank.txt", new int[]{3, 9});
     }
 
     @Test
@@ -74,6 +78,14 @@ public class Task1DWTests {
     public void testBlankDocument() {
         Assertions.assertEquals(0, dwig4.getEmailCount(0, 0));
         Assertions.assertEquals(0, dwig4.getEmailCount(1, 2));
+        Assertions.assertEquals(0, dwig6.getEmailCount(1, 2));
+        Assertions.assertEquals(0, dwig7.getEmailCount(1, 2));
+    }
+
+    @Test
+    public void testGetIdsBlankDocument() {
+        Set<Integer> expected = new HashSet<>();
+        Assertions.assertEquals(expected, dwig7.getUserIDs());
     }
 
     @Test
