@@ -20,7 +20,7 @@ public class Task4DWTests {
         dwig1 = new DWInteractionGraph("resources/Task4Transactions1.txt");
         dwig2 = new DWInteractionGraph("resources/Task4Transactions2.txt");
         dwig3 = new DWInteractionGraph("resources/Task4Transactions3.txt");
-        dwig4 = new DWInteractionGraph("resources/email-Eu-core-temporal.txt");
+        dwig4 = new DWInteractionGraph("resources/email-Eu-core-temporal-Dept1.txt");
     }
 
     @Test
@@ -46,6 +46,6 @@ public class Task4DWTests {
     @Test
     public void testLargeDatabase1(){
         //Commented out as takes too long to compile.
-        //Assertions.assertTrue(dwig4.MaxBreachedUserCount(20) > 0);
+        System.out.println(dwig4.MaxBreachedUserCount(10));
     }
 }

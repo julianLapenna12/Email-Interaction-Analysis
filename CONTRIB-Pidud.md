@@ -5,54 +5,35 @@
 #Contributions
 
 ##Tasks:
-* ####Task 3 + testing
-* ####Task 6 + testing
+* ###Tasks 1.1, 2, 3, 4 DWInteractionGraph + testing
 
 ##Classes:
-* `Document.java`
-* `ComplexNumber.java`
-* `Cryptography.java`
-* `DFT.java`
-* `Untangler.java`
-* `SentimentAnalysis.java`
-* `SentenceAnalysis.java`
-* `ComplexNumberTests.java`
-* `CryptographyTest.java`
-* `DFTTests.java`
-* `UntanglerTest.java`
-* `Task3Tests.java`
+
 ##Document.java Methods Implemented:
-* `Document(String docId, URL docURL)`
-* `getMostPositiveSentence`
-* `getMostNegativeSentence`
+* `DWInteractionGraph.java`
+* `EmailUser.java`
+* `Task2DWTests`
+* `Task3DWTests`
+* `Task4DWTests`
 
 
-##ComplexNumber.java Methods Implemented:
-* ####All methods
+##DWInteractionGraph.java Methods Implemented:
+* `getEmailData()`
+* `ReportActivityInTimeWindow()`
+* `ReportOnUser()`
+* `getNumEmailSent()`
+* `getNumEmailReceived()`
+* `getRecipientSet()`
+* `getSenderSet()`
+* `createReceiverGraph()`
+* `NthMostActiveUser()`
+* `BFS()`
+* `DFS()`
+* `recursiveSearch()`
+* `MaxBreachedUserCount()`
+* `findPolluted()`
+##EmailUSer.java Methods Implemented:
 
-##Cryptography.java Implementation:
-* ####Everything
-
-##DFT.java Implementation:
-* ####Everything
-
-##Untangler.java Implementation:
-* ####Everything
-
-##SentimentAnalysis.java Implementation:
-* ####Everything
-
-##SentenceAnalysis.java Implementation:
-* ####Everything
-
-##Untangler.java Implementation:
-* ####Everything
-
-##Untangler.java Implementation:
-* ####Everything
-
-##/resources Implemented:
-* ####NeutralStatement.txt
-* ####PositiveNegativeSentence.txt
+##UDWInteractionGraph.java Methods Implemented:
 
 
