@@ -4,7 +4,7 @@
 
 | Compilation | Timeout | Duration |
 |:-----------:|:-------:|:--------:|
-||NoNoNoNo|186.84|
+|YesYesYesYes|NoNoNoNo|186.84|
 
 ## Comments
 Some minor style issues (why was countNodes functionality compressed into one line?).  Comments are OK (but still too few) overall, but excessive in some areas (we don't need full specs for every constant), and lacking in other areas (entire methods like BFS have no comments to guide reader).  RI is a good start but not comprehensive, leaving out several key concrete variables and not a deep enough analysis of acceptable values.  Please read more on AFs as the ones written show a general misunderstanding of what an AF actually is/does.  Specs are very good for the most part - just try to be a bit more explicit with domains/ranges (such as returning -1 for NthMostActiveUser) and better overall descriptions of the method's functionality.  EmailUser class has many issues but and wasn't coded to the same standard as other classes.
