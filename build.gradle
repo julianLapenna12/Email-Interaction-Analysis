@@ -1,47 +1,80 @@
 plugins {
     id 'java'
+    id 'checkstyle'
     id 'jacoco'
+    id 'application'
 }
 
-group 'ca.ubc.ece.cpen221'
-version '0.1-SKEL'
+group 'CPEN 221 - MP2'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.16
+targetCompatibility = 1.16
 
 repositories {
     mavenCentral()
+    jcenter()
+}
+
+ext {
+    junitJupiterVersion = "5.5.2"
+    junit4Version = "4.1.2"
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+    implementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+
+    testImplementation(
+            // Uncomment to use junit4
+            "junit:junit:${junit4Version}",
+            "org.junit.jupiter:junit-jupiter-migrationsupport:${junitJupiterVersion}",
+            "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
+    )
+
+    testRuntimeOnly(
+            // Uncomment to use junit4
+            "org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}",
+            "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    )
+
+    implementation platform('com.google.cloud:libraries-bom:23.0.0')
+    implementation 'com.google.cloud:google-cloud-language'
+
+    test {
+        useJUnitPlatform()
+    }
+
 }
 
-test {
-    useJUnitPlatform()
-    finalizedBy jacocoTestReport
+checkstyle {
+    toolVersion '9.1'
 }
 
-check {
-    dependsOn jacocoTestCoverageVerification
+tasks.withType(Checkstyle) {
+    source 'src/main'
+    include '**/*.java'
+    // classpath = files()
+    reports {
+        xml.enabled     true
+        html.enabled    false
+    }
 }
 
-jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            limit {
-                counter = 'CLASS'
-                value = 'COVEREDRATIO'
-                minimum = 1.0
-            }
-            limit {
-                counter = 'LINE'
-                value = 'COVEREDRATIO'
-                minimum = 0.9
-            }
-            limit {
-                counter = 'BRANCH'
-                value = 'COVEREDRATIO'
-                minimum = 0.85
-            }
-        }
+jacoco {
+    toolVersion = "0.8.7"
+    reportsDir = file("$buildDir/reports/jacoco")
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled true
+        html.enabled false
     }
 }
